@@ -14,7 +14,7 @@ function SignUp() {
         e.preventDefault();
 
         try {
-            const res = await axios.post("http://localhost:5010/auth", {
+            const res = await axios.post("http://localhost:5010/auth/signup", {
                 Name: name,
                 Email: email,
                 Password: pass,
@@ -23,9 +23,9 @@ function SignUp() {
             const response = res.data;
             setans(response);
 
-            if (response.role === "user") {
-                navigate("/");
-            }
+            navigate("/Login");
+            
+            
 
             console.log(response);
         } catch (err) {
