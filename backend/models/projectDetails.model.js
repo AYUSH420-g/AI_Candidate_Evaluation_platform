@@ -12,6 +12,10 @@ const project=new mongoose.Schema({
         required : true
     },
 
+    adminId:{
+        type: mongoose.Schema.Types.ObjectId,
+        required: true,
+    },
     recruiterList:[{
         type:mongoose.Schema.Types.ObjectId, ref:"User"
 

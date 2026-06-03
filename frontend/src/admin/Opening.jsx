@@ -10,6 +10,7 @@ function Admin() {
 
     const [selectedRecruiterIds, setSelectedRecruiterIds] = useState([]);
     const [selectedRecruiterObjects, setSelectedRecruiterObjects] = useState([]);
+    const token=localStorage.getItem("token");
 
     async function handleOpening(e) {
         e.preventDefault();
@@ -25,7 +26,8 @@ function Admin() {
             const payload = {
                 projectName: projName,
                 jobDescription: jd,
-                recruiterIds: selectedRecruiterIds
+                recruiterIds: selectedRecruiterIds,
+                token:token
             };
 
             await axios.post("http://localhost:5010/admin/assign-project",

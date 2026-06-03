@@ -1,6 +1,7 @@
 // import mongoose from "mongoose";
 import User from "../models/user.model.js";
 import projectDetails from "../models/projectDetails.model.js";
+import jwt from "jsonwebtoken";
 const searchQuery=async(req,res)=>{
 
     try{
@@ -28,13 +29,15 @@ const searchQuery=async(req,res)=>{
 const storeDetails=async(req,res)=>{
 
     try{
-        const {projectName, jobDescription, recruiterIds}=req.body;
+        const {projectName, jobDescription, recruiterIds, token}=req.body;
+        const decoded=jwt.verify(token,process.env.JWT_SECRET);
 
         const query={};
 
         query.projectName=projectName;
         query.jobDescription=jobDescription;
         query.recruiterList=recruiterIds;
+        query.adminId=decoded.id;
 
         const q=await projectDetails.create(query);
          res.status(201).json({data:q});
