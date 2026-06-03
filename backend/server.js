@@ -1,6 +1,7 @@
 import express from "express"
 import userRoute from "./routes/auth.route.js"
 import adminRoute from "./routes/admin.route.js"
+import recruiterRoute from "./routes/recruiter.route.js"
 import dotenv from "dotenv"
 import connectDB from "./db.js";
 import cors from "cors";
@@ -17,6 +18,7 @@ app.use(express.json());
 
 app.use("/auth",userRoute);
 app.use("/admin",adminRoute);
+app.use("/recruiter",recruiterRoute);
 
 const PORT=process.env.PORT || 5010
 app.listen(PORT,()=>{

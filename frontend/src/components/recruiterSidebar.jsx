@@ -1,7 +1,8 @@
 import { useNavigate ,useLocation} from "react-router-dom";
-function Sidebar() {
-    function handleOpening() {
-        navigate("/Opening");
+function RecruiterSidebar() {
+
+    function handleProject() {
+        navigate("/Project");
     }
 
     const navigate = useNavigate();
@@ -11,17 +12,17 @@ function Sidebar() {
         <div className="fixed left-0 top-0 flex h-screen w-64 flex-col bg-gray-100 border p-4 text-black">
 
             <h1 className="mb-8 text-2xl font-bold">
-                Admin Dashboard
+                Recruiter Dashboard
             </h1>
 
             <button
-                onClick={handleOpening}
+                onClick={handleProject}
                 className={`mb-3 rounded-lg px-4 py-3 text-left hover:bg-gray-300 ${
-                    location.pathname==="/Opening" ?"bg-gray-300 text-black"
+                    location.pathname==="/Project" ?"bg-gray-300 text-black"
                     :"hover:bg-gray-100 text-black"
                 }`}
             >
-                Openings
+                Project
             </button>
 
             <button className="mb-3 rounded-lg px-4 py-3 text-left hover:bg-gray-300">
@@ -43,4 +44,4 @@ function Sidebar() {
         </div>
     );
 }
-export default Sidebar;
+export default RecruiterSidebar;

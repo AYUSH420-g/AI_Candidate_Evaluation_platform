@@ -156,7 +156,7 @@ function Admin() {
 
                         <button
                             type="submit"
-                            className="w-full rounded-lg bg-blue-600 py-3 font-semibold text-white transition hover:bg-blue-700"
+                            className="w-60 rounded-lg bg-blue-600 py-3 font-semibold text-white transition hover:bg-blue-700"
                         >
                             Send to Recruiters
                         </button>

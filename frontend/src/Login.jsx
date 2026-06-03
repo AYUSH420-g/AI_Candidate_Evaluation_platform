@@ -25,11 +25,11 @@ function Login()
                 localStorage.setItem("role",role);
 
                 if (role === "admin") {
-                    navigate("/Admin");
+                    navigate("/Opening");
                 }
                 else if(role === "recruiter")
                 {
-                    navigate("/");
+                    navigate("/Project");
                 }
                 
             }
