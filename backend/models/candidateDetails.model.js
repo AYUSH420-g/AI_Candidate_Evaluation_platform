@@ -40,6 +40,9 @@ const candidateDetailsSchema = new mongoose.Schema(
             enum: ["Pending", "Rejected", "Selected"],
             default: "Pending",
         },
+        resumeText: {
+            type: String
+}
     },
     {
         timestamps: true,

@@ -4,6 +4,7 @@ import SignUp from './Signup';
 import Login from "./Login";
 import Opening from "./admin/Opening";
 import Project from "./recruiter/Project";
+import Status from "./admin/Status";
 
 function App() {
   
@@ -15,6 +16,7 @@ function App() {
         <Route path="/Login" element={<Login/>}/>
         <Route path="/Opening" element={<Opening/>}/>
         <Route path="/Project" element={<Project/>}/>
+        <Route path="/Status" element={<Status/>}/>
       </Routes>
     </BrowserRouter>
   );

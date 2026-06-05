@@ -1,9 +1,12 @@
 import express from "express"
-import {searchQuery,storeDetails} from "../controllers/admin.controller.js";
+import multer from "multer";
+import {getStatus, searchQuery,storeDetails} from "../controllers/admin.controller.js";
 
 const route=express.Router();
+const upload=multer({storage:multer.memoryStorage()});
 
 route.get("/getrecruiter",searchQuery);
-route.post("/assign-project",storeDetails);
+route.post("/assign-project",upload.single('jobDesc'),storeDetails);
+route.get("/getstatus",getStatus);
 
 export default route;

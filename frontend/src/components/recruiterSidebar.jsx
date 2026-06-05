@@ -25,7 +25,7 @@ function RecruiterSidebar() {
                 Project
             </button>
 
-            <button className="mb-3 rounded-lg px-4 py-3 text-left hover:bg-gray-300">
+            {/* <button className="mb-3 rounded-lg px-4 py-3 text-left hover:bg-gray-300">
                 A
             </button>
 
@@ -39,7 +39,7 @@ function RecruiterSidebar() {
 
             <button className="rounded-lg px-4 py-3 text-left hover:bg-gray-300">
                 D
-            </button>
+            </button> */}
 
         </div>
     );

@@ -4,9 +4,10 @@ import { useEffect, useState } from "react";
 
 function Admin() {
     const [projName, setptojName] = useState("");
-    const [jd, setjd] = useState("");
+    // const [jd, setjd] = useState("");
     const [searchQuery, setSearchQuery] = useState("");
     const [receivedRecruiter, setreceivedRecruiter] = useState([]);
+    const [file,setfile]=useState(null);
 
     const [selectedRecruiterIds, setSelectedRecruiterIds] = useState([]);
     const [selectedRecruiterObjects, setSelectedRecruiterObjects] = useState([]);
@@ -23,21 +24,27 @@ function Admin() {
                 return;
             }
 
-            const payload = {
-                projectName: projName,
-                jobDescription: jd,
-                recruiterIds: selectedRecruiterIds,
-                token:token
-            };
+            if (!file) {
+                alert("Please select a PDF");
+                return;
+            }
+            const formData=new FormData();
+            formData.append('jobDesc',file);
+            formData.append('projectName',projName);
+            formData.append('listOfRecruiters',receivedRecruiter);
+            formData.append('token',token);
+
+           
 
             await axios.post("http://localhost:5010/admin/assign-project",
-                payload
+                formData
+                
             );
 
             alert("Project details sent successfully!");
 
             setptojName("");
-            setjd("");
+            setfile(null);
             setSearchQuery("");
             setSelectedRecruiterIds([]);
             setSelectedRecruiterObjects([]);
@@ -146,14 +153,13 @@ function Admin() {
 
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">Job Description</label>
-                            <textarea
-                                value={jd}
-                                onChange={(e) => setjd(e.target.value)}
-                                placeholder="Enter job description details..."
-                                rows="5"
-                                className="w-full rounded-lg border border-gray-300 px-4 py-2 outline-none transition focus:border-blue-500 resize-none"
-                                required
-                            />
+                            
+                            <input type="file"
+                            accept=".pdf"
+                            target={file}
+                                onChange={(e)=>setfile(e.target.files[0])}/>
+
+                            
                         </div>
 
                         <button

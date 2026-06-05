@@ -1,5 +1,5 @@
 import express from "express";
-import { displayOpenings, handleCandidate } from "../controllers/recruiter.controller.js";
+import { displayOpenings, handleAnalyse, handleCandidate } from "../controllers/recruiter.controller.js";
 import upload from "../middleware/upload.js";
 
 const router=express.Router();
@@ -9,4 +9,5 @@ router.post("/addCandidate",
     upload.single("candidateCv"),
     handleCandidate
 );
+router.post("/analyse",handleAnalyse);
 export default router;

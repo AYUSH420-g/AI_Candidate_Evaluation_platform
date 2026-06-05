@@ -4,6 +4,10 @@ function Sidebar() {
         navigate("/Opening");
     }
 
+    function handleStatus() {
+        navigate("/Status");
+    }
+
     const navigate = useNavigate();
     const location=useLocation();
 
@@ -24,11 +28,15 @@ function Sidebar() {
                 Openings
             </button>
 
-            <button className="mb-3 rounded-lg px-4 py-3 text-left hover:bg-gray-300">
-                A
+            <button onClick={handleStatus}
+                className={`mb-3 rounded-lg px-4 py-3 text-left hover:bg-gray-300 ${
+                    location.pathname==="/Status" ?"bg-gray-300 text-black"
+                    :"hover:bg-gray-100 text-black"
+                }`}>
+                Status
             </button>
 
-            <button className="mb-3 rounded-lg px-4 py-3 text-left hover:bg-gray-300">
+            {/* <button className="mb-3 rounded-lg px-4 py-3 text-left hover:bg-gray-300">
                 B
             </button>
 
@@ -38,7 +46,7 @@ function Sidebar() {
 
             <button className="rounded-lg px-4 py-3 text-left hover:bg-gray-300">
                 D
-            </button>
+            </button> */}
 
         </div>
     );

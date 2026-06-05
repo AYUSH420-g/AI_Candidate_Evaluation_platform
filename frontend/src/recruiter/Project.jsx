@@ -11,14 +11,33 @@ function Project()
     const [projectId, setProjectId] = useState("");
     const [adminid, setAdminId] = useState("");
     const [successMsg, setSuccessMsg] = useState("");
+    // const [id,setid]=useState("");
    
     const token=localStorage.getItem("token");
     
 
+    async function analyseCandidate(c_id) {
+        
+        try{
+            
+            const res=await axios.post("http://localhost:5010/recruiter/analyse",{
+                id:c_id,
+                projectId:projectId
+
+            });
+            if(res.data)
+                alert("success");
+        }
+        catch(err)
+        {
+            console.log(err);
+        }
+    }
+
     async function handleCandidate()
     {
         try{
-
+            
             if(!cv){
                 alert("cv is requierd");
                 return;
@@ -39,6 +58,9 @@ function Project()
             if (res.data) {
                 setSuccessMsg("Candidate added successfully!");
                 setModalOpen(false);
+                // setid(res.data._id);
+                // console.log(projectId);
+                analyseCandidate(res.data.data._id);
 
                 setTimeout(() => {
                     setSuccessMsg("");
@@ -117,6 +139,7 @@ function Project()
 
                         <button className="ml-6 rounded-lg bg-blue-600 px-5 py-2 text-sm font-medium text-white transition hover:bg-blue-700"
                             onClick={()=>{
+                                // console.log(project._id);
                                 setProjectId(project._id);
                                 setAdminId(project.adminId);
                                 setModalOpen(true)}}>
