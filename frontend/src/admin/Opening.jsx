@@ -31,7 +31,7 @@ function Admin() {
             const formData=new FormData();
             formData.append('jobDesc',file);
             formData.append('projectName',projName);
-            formData.append('listOfRecruiters',receivedRecruiter);
+            formData.append('listOfRecruiters',JSON.stringify(selectedRecruiterIds));
             formData.append('token',token);
 
            
@@ -67,6 +67,7 @@ function Admin() {
                 });
 
                 setreceivedRecruiter(res.data.recruiters || res.data);
+                // console.log(receivedRecruiter);
             } catch (e) {
                 console.log(e);
             }

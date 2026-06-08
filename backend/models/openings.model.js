@@ -14,7 +14,7 @@ const openingSchema = new mongoose.Schema(
     },
     
     recruiterList:{
-        type:[String],
+        type: mongoose.Schema.Types.ObjectId,
         default:[]
     },
 
@@ -51,6 +51,16 @@ const openingSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
+
+    embeddingText: {
+    type: String,
+    default: ""
+    },
+
+     jdEmbedding: {
+      type: [Number],
+      default: []
+    }
   },
   {
     timestamps: true,

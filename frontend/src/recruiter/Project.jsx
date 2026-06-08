@@ -5,11 +5,11 @@ function Project()
 {
     const [assignedOpenings,setAssignedOpenings]=useState([]);
     const [ModalOpen,setModalOpen]=useState(false);
-    const [name,setname]=useState("");
-    const [email,setemail]=useState("");
+    // const [name,setname]=useState("");
+    // const [email,setemail]=useState("");
     const [cv, setCv] = useState(null);
     const [projectId, setProjectId] = useState("");
-    const [adminid, setAdminId] = useState("");
+    // const [adminid, setAdminId] = useState("");
     const [successMsg, setSuccessMsg] = useState("");
     // const [id,setid]=useState("");
    
@@ -34,47 +34,45 @@ function Project()
         }
     }
 
-    async function handleCandidate()
-    {
-        try{
-            
-            if(!cv){
-                alert("cv is requierd");
-                return;
-            }
-            
-                
-            const formData = new FormData();
+    async function handleCandidate() {
+    try {
 
-            formData.append("candidateName", name);
-            formData.append("candidateEmail", email);
-            formData.append("candidateCv", cv);
-            formData.append("recruiterId", token);
-            formData.append("adminId", adminid);
-            formData.append("projectId", projectId);
-
-            const res=await axios.post("http://localhost:5010/recruiter/addCandidate",formData);
-
-            if (res.data) {
-                setSuccessMsg("Candidate added successfully!");
-                setModalOpen(false);
-                // setid(res.data._id);
-                // console.log(projectId);
-                analyseCandidate(res.data.data._id);
-
-                setTimeout(() => {
-                    setSuccessMsg("");
-                }, 3000);
-            }
-
-
-
+        if (!cv) {
+            alert("CV is required");
+            return;
         }
-        catch(e)
-        {
-            console.log(e);
+
+        const formData = new FormData();
+
+        formData.append("candidateCv", cv);
+        formData.append("projectId", projectId);
+
+        const res = await axios.post(
+            "http://localhost:5010/recruiter/addCandidate",
+            formData,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            }
+        );
+
+        if (res.data) {
+            setSuccessMsg("Candidate added successfully!");
+            setModalOpen(false);
+            console.log(res.data);
+            analyseCandidate(res.data.candidate._id);
+
+            setTimeout(() => {
+                setSuccessMsg("");
+            }, 3000);
         }
+
     }
+    catch (e) {
+        console.log(e);
+    }
+}
 
     useEffect(()=>{
         const getprojects=async()=>{
@@ -128,9 +126,9 @@ function Project()
                             
 
                             <div>
-                                <p className="text-xs font-semibold uppercase tracking-wide text-red-300">
+                                {/* <p className="text-xs font-semibold uppercase tracking-wide text-red-300">
                                     Job Description
-                                </p>
+                                </p> */}
                                 <p className="text-sm text-gray-900">
                                     {project.jobDescription}
                                 </p>
@@ -141,7 +139,7 @@ function Project()
                             onClick={()=>{
                                 // console.log(project._id);
                                 setProjectId(project._id);
-                                setAdminId(project.adminId);
+                                // setAdminId(project.adminId);
                                 setModalOpen(true)}}>
                             Add Candidate
                         </button>
@@ -166,21 +164,6 @@ function Project()
                 </button>
             </div>
 
-            <input
-                type="text"
-                placeholder="Candidate Name"
-                className="mb-3 w-full rounded-lg border p-3"
-                value={name}
-                onChange={(e)=>setname(e.target.value)}
-            />
-
-            <input
-                type="email"
-                placeholder="Candidate Email"
-                className="mb-3 w-full rounded-lg border p-3"
-                value={email}
-                onChange={(e)=>setemail(e.target.value)}
-            />
 
             <input
                 type="file"

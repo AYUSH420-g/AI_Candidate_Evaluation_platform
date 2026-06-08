@@ -1,6 +1,6 @@
 import Opening from "../models/openings.model.js";
 import User from "../models/user.model.js";
-import candidateDetails from "../models/candidateDetails.model.js";
+// import candidateDetails from "../models/candidateDetails.model.js";
 import jwt from "jsonwebtoken";
 import pdf from "pdf-parse";
 import ollama from "ollama";
@@ -33,6 +33,7 @@ const storeDetails=async(req,res)=>{
     try{
 
         const {projectName, listOfRecruiters, token}=req.body;
+        const list = JSON.parse(req.body.listOfRecruiters);
         const decoded=jwt.verify(token,process.env.JWT_SECRET);
        
         const data=await pdf(req.file.buffer);
@@ -183,10 +184,38 @@ const storeDetails=async(req,res)=>{
             });
 
             const job = JSON.parse(response.message.content);
+           
+            const embeddingText = `
+                Job Title: ${job.job_title}
+
+                Seniority Level: ${job.seniority_level}
+
+                Experience Required: ${job.experience_required_years ?? 0} years
+
+                Mandatory Skills:
+                ${job.mandatory_skills.join(", ")}
+
+                Preferred Skills:
+                ${job.preferred_skills.join(", ")}
+
+                Soft Skills:
+                ${job.soft_skills.join(", ")}
+
+                Summary:
+                ${job.brief_summary ?? ""}
+                `;
+
+            const embeddingResponse = await ollama.embed({
+                model: "embeddinggemma",
+                input: embeddingText
+                });
+
+            const jdEmbedding =
+                embeddingResponse.embeddings[0];
 
             const query = {
                 projectName,
-                recruiterList: listOfRecruiters,
+                recruiterList: list,
                 adminId: decoded.id,
                 jobTitle: job.job_title,
                 seniorityLevel: job.seniority_level,
@@ -194,12 +223,14 @@ const storeDetails=async(req,res)=>{
                 mandatorySkills: job.mandatory_skills,
                 preferredSkills: job.preferred_skills,
                 softSkills: job.soft_skills,
-                briefSummary: job.brief_summary
+                briefSummary: job.brief_summary,
+                embeddingText,
+                jdEmbedding
             };
 
             const opening = await Opening.create(query);
         
-        return res.status(201).json({message:"successful"});
+        return res.status(201).json({message:opening});
 
 
     }
@@ -211,26 +242,26 @@ const storeDetails=async(req,res)=>{
     }
 }
 
-const getStatus=async (req,res)=>{
+// const getStatus=async (req,res)=>{
 
-    try{
-        const token=req.headers.authorization.split(" ")[1];
-        const decoded=jwt.verify(token,process.env.JWT_SECRET);
-        const id=decoded.id;
+//     try{
+//         const token=req.headers.authorization.split(" ")[1];
+//         const decoded=jwt.verify(token,process.env.JWT_SECRET);
+//         const id=decoded.id;
 
-        const name=await candidateDetails.find({adminId:id},{candidateName:1,_id:0
-        });
+//         const name=await candidateDetails.find({adminId:id},{candidateName:1,_id:0
+//         });
 
-        if(name)
-            return res.status(201).json({message:name});
+//         if(name)
+//             return res.status(201).json({message:name});
 
-        return res.status(400).json({message:"no name found"});
-    }
-    catch(e)
-    {
-        console.log(e);
-    }
+//         return res.status(400).json({message:"no name found"});
+//     }
+//     catch(e)
+//     {
+//         console.log(e);
+//     }
 
 
-}
-export {searchQuery,storeDetails,getStatus};
+// }
+export {searchQuery,storeDetails};
