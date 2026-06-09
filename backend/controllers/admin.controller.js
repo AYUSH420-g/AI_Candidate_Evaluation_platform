@@ -4,6 +4,7 @@ import User from "../models/user.model.js";
 import jwt from "jsonwebtoken";
 import pdf from "pdf-parse";
 import ollama from "ollama";
+import candidateMatch from "../models/candidateMatch.model.js";
 const searchQuery=async(req,res)=>{
 
     try{
@@ -242,26 +243,48 @@ const storeDetails=async(req,res)=>{
     }
 }
 
-// const getStatus=async (req,res)=>{
+const getStatus=async (req,res)=>{
 
-//     try{
-//         const token=req.headers.authorization.split(" ")[1];
-//         const decoded=jwt.verify(token,process.env.JWT_SECRET);
-//         const id=decoded.id;
+    try{
+    
+         const projects=await Opening.find({},"_id projectName");
 
-//         const name=await candidateDetails.find({adminId:id},{candidateName:1,_id:0
-//         });
+        return res.status(201).json({message:projects});
 
-//         if(name)
-//             return res.status(201).json({message:name});
-
-//         return res.status(400).json({message:"no name found"});
-//     }
-//     catch(e)
-//     {
-//         console.log(e);
-//     }
+    }
+    catch(e)
+    {
+        console.log(e);
+    }
 
 
-// }
-export {searchQuery,storeDetails};
+}
+
+const displaystatus=async (req,res)=>{
+    try{
+        const id=req.query.id;
+
+        const response=await candidateMatch.find({openingId:id},{
+            candidateName:1,
+            matchedSkills:1,
+            missingSkills:1,
+            candidateId:1,
+            overallScore:1,
+
+
+        })
+
+        return res.status(200).json({
+            response,
+        });
+
+
+    }
+    catch(e)
+    {
+        console.log(e);
+        return res.status(400);   
+    }
+}
+
+export {searchQuery,storeDetails,getStatus,displaystatus};

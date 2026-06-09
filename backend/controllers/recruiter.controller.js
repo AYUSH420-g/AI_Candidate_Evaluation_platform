@@ -257,6 +257,9 @@ const handleAnalyse = async (req,res)=>{
 
         const candidate =
             await Candidate.findById(id);
+        
+            const candidateName =
+            await Candidate.findById(id).select("name");
 
         const opening =
             await Opening.findById(projectId);
@@ -371,6 +374,8 @@ const handleAnalyse = async (req,res)=>{
             await candidateMatch.create({
 
                 candidateId:id,
+
+                candidateName:candidateName.name,
 
                 openingId:projectId,
 

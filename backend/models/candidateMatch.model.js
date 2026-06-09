@@ -7,6 +7,11 @@ const candidateMatchSchema = new mongoose.Schema(
         required:true
     },
 
+    candidateName:{
+        type:String,
+        required:true
+    },
+
     openingId:{
         type:mongoose.Schema.Types.ObjectId,
         required:true
@@ -55,6 +60,12 @@ const candidateMatchSchema = new mongoose.Schema(
     recommendation:{
         type:String,
         default:""
+    }
+    ,
+    status:{
+        type:Number,
+        enum:[0,1,2],
+        default:0
     }
 },
 {
