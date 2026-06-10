@@ -9,19 +9,14 @@ const handleSignup=async (req,res)=>{
 
         const existingUser = await User.findOne({ Email });
 
-            if (existingUser) {
+        if (existingUser) {
             return res.status(400).json({ message: "Email already registered" });
-            }
-
-        if(Password.length<6)
-        {
-            return res.status(400).json({message:"password must atleast 6 char long"});
         }
+
 
         const hashedpass=await bcrypt.hash(Password,10);
 
         const userData=await User.create({Name,Email,Password:hashedpass});
-        // const saveUser=await userData.save();
 
         res.status(201).json({data:userData});
 
@@ -35,10 +30,8 @@ const handleSignup=async (req,res)=>{
 const handleLogin=async(req,res)=>{
 
     try{
+        
         const {Email,Password}=req.body;
-
-        if(!Password)
-            return res.status(400).json({message:"Email or password is missing"});
 
        
         const user=await User.findOne({Email:Email});

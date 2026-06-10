@@ -6,13 +6,21 @@ function Login()
 
     const [email, setemail] = useState("");
     const [pass, setpass] = useState("");
+    const [err,seterror]=useState("");
     const navigate=useNavigate();
 
     async function handleLogin(e) {
         
             e.preventDefault();
 
+
             try{
+
+              if(!email || !pass)
+              {
+                seterror("both fields are required");
+              }
+              seterror("");
                 const res=await axios.post("http://localhost:5010/auth/login",{
                     
                         Email:email,
@@ -82,6 +90,8 @@ function Login()
         </button>
 
       </form>
+
+      {err && <p className="text-red-500">{err}</p>}
     </div>
   </div>
 );

@@ -426,4 +426,23 @@ const handleAnalyse = async (req,res)=>{
     }
 };
 
-export {displayOpenings,handleCandidate,handleAnalyse}
+const getCandidates=async(req,res)=>{
+    try{
+
+            const id=req.query.projectId;
+           
+            const candidates = await candidateMatch.find({openingId:id}).select("candidateName");
+
+            return res.status(200).json({
+            candidates
+        });
+
+            
+    }
+    catch(err)
+    {
+        console.log(err);
+    }
+}
+
+export {displayOpenings,handleCandidate,handleAnalyse,getCandidates}

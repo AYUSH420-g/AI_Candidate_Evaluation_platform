@@ -33,7 +33,7 @@ const storeDetails=async(req,res)=>{
 
     try{
 
-        const {projectName, listOfRecruiters, token}=req.body;
+        const {projectName, token}=req.body;
         const list = JSON.parse(req.body.listOfRecruiters);
         const decoded=jwt.verify(token,process.env.JWT_SECRET);
        
@@ -172,6 +172,7 @@ const storeDetails=async(req,res)=>{
 
             ${data.text}
             `;
+            
             const response=await ollama.chat({
 
                 model:"llama3.2:3b",

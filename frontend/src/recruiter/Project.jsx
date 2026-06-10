@@ -1,19 +1,46 @@
 import { useEffect,useState} from "react";
 import RecruiterSidebar from "../components/recruiterSidebar.jsx";
 import axios from "axios";
+import { Eye } from "lucide-react";
+
 function Project()
 {
     const [assignedOpenings,setAssignedOpenings]=useState([]);
     const [ModalOpen,setModalOpen]=useState(false);
-    // const [name,setname]=useState("");
-    // const [email,setemail]=useState("");
     const [cv, setCv] = useState(null);
     const [projectId, setProjectId] = useState("");
-    // const [adminid, setAdminId] = useState("");
     const [successMsg, setSuccessMsg] = useState("");
-    // const [id,setid]=useState("");
+    const [openProject, setOpenProject] = useState(null);
+    const [candidateMap, setCandidateMap] = useState({});
    
     const token=localStorage.getItem("token");
+
+    const handleViewCandidates = async (projectId) => {
+    try {
+        if (openProject === projectId) {
+            setOpenProject(null);
+            return;
+        }
+
+        const res = await axios.get(
+            "http://localhost:5010/recruiter/getCandidates",
+            {
+                params: {
+                    projectId,
+                },
+            }
+        );
+
+        setCandidateMap((prev) => ({
+            ...prev,
+            [projectId]: res.data.candidates,
+        }));
+
+        setOpenProject(projectId);
+    } catch (err) {
+        console.log(err);
+    }
+};
     
 
     async function analyseCandidate(c_id) {
@@ -60,7 +87,7 @@ function Project()
         if (res.data) {
             setSuccessMsg("Candidate added successfully!");
             setModalOpen(false);
-            console.log(res.data);
+            // console.log(res.data);
             analyseCandidate(res.data.candidate._id);
 
             setTimeout(() => {
@@ -109,44 +136,86 @@ function Project()
             )}
             <div className="space-y-4">
                 {assignedOpenings.map((project) => (
-                    <div
-                        key={project._id}
-                        className="flex items-center justify-between rounded-lg border border-gray-200 bg-white p-5 shadow-sm hover:shadow-md transition"
-                    >
-                        <div className="flex-1">
-                            <div className="mb-3">
-                                <p className="text-xs font-semibold uppercase tracking-wide text-red-300">
-                                    Project Name
-                                </p>
-                                <h2 className="text-xl font-bold text-gray-600">
-                                    {project.projectName}
-                                </h2>
-                            </div>
+    <div key={project._id}>
 
-                            
+        <div
+            className="flex items-center justify-between rounded-lg border border-gray-200 bg-white p-5 shadow-sm hover:shadow-md transition"
+        >
+            
 
-                            <div>
-                                {/* <p className="text-xs font-semibold uppercase tracking-wide text-red-300">
-                                    Job Description
-                                </p> */}
-                                <p className="text-sm text-gray-900">
-                                    {project.jobDescription}
-                                </p>
-                            </div>
-                        </div>
+            <div className="flex-1">
+                <div className="mb-3">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-red-300">
+                        Project Name
+                    </p>
+                    <h2 className="text-xl font-bold text-gray-600">
+                        {project.projectName}
+                    </h2>
+                </div>
 
-                        <button className="ml-6 rounded-lg bg-blue-600 px-5 py-2 text-sm font-medium text-white transition hover:bg-blue-700"
-                            onClick={()=>{
-                                // console.log(project._id);
-                                setProjectId(project._id);
-                                // setAdminId(project.adminId);
-                                setModalOpen(true)}}>
-                            Add Candidate
-                        </button>
-                    </div>
-                ))}
+                <div>
+                    <p className="text-sm text-gray-900">
+                        {project.jobDescription}
+                    </p>
+                </div>
+            </div>
+
+            <div className="ml-6 flex gap-2">
+                <button
+                    className="rounded-lg bg-blue-600 px-5 py-2 text-sm font-medium text-white hover:bg-blue-700"
+                    onClick={() => {
+                        setProjectId(project._id);
+                        setModalOpen(true);
+                    }}
+                >
+                    Add Candidate
+                </button>
+
+                <button
+                    className="rounded-lg border border-gray-300 p-2 hover:bg-gray-100"
+                    onClick={() => handleViewCandidates(project._id)}
+                >
+                    <Eye size={20} />
+                </button>
             </div>
         </div>
+
+        {openProject === project._id && (
+            <div className="ml-10 mt-3 space-y-3">
+                {candidateMap[project._id]?.length > 0 ? (
+                    candidateMap[project._id].map((candidate) => (
+                        <div
+                            key={candidate._id}
+                            className="rounded-lg border bg-[#f0f0f2] pt-2 pb-2 pl-4 shadow"
+                        >
+                            <div className="flex justify-between items-center">
+                                <div>
+                                    <h3 className="font-normal">
+                                        {candidate.candidateName}
+                                    </h3>
+
+                                    <p className="text-sm text-gray-500">
+                                        Status: 
+                                    </p>
+                                </div>
+
+                            </div>
+                        </div>
+                    ))
+                ) : (
+                    <div className="rounded-lg bg-white p-4 shadow">
+                        No candidates found
+                    </div>
+                )}
+            </div>
+        )}
+
+    </div>
+))}
+            </div>
+</div>
+        
+        
 
         {ModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">

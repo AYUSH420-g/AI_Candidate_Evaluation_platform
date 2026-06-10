@@ -7,6 +7,7 @@ function SignUp() {
     const [email, setemail] = useState("");
     const [pass, setpass] = useState("");
     const [ans, setans] = useState("");
+    const [err,seterror]=useState("");
 
     const navigate = useNavigate();
 
@@ -14,6 +15,19 @@ function SignUp() {
         e.preventDefault();
 
         try {
+
+            if(!name || !email)
+            {
+                seterror("This Field is required");
+                return;
+            }
+            if(pass.length < 8)
+            {
+                seterror("Password must be 8 character long");
+                return;
+            }
+            seterror("");
+
             const res = await axios.post("http://localhost:5010/auth/signup", {
                 Name: name,
                 Email: email,
@@ -75,6 +89,8 @@ function SignUp() {
                         Sign Up
                     </button>
                 </form>
+
+                {err && <p className="text-red-500">{err}</p>}
 
                 {ans && (
                     <p className="mt-4 text-center text-sm text-green-600">

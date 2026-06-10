@@ -1,5 +1,5 @@
 import express from "express";
-import { displayOpenings, handleAnalyse, handleCandidate } from "../controllers/recruiter.controller.js";
+import { displayOpenings, handleAnalyse, handleCandidate ,getCandidates} from "../controllers/recruiter.controller.js";
 import upload from "../middleware/upload.js";
 
 const router=express.Router();
@@ -10,4 +10,5 @@ router.post("/addCandidate",
     handleCandidate
 );
 router.post("/analyse",handleAnalyse);
+router.get("/getCandidates",getCandidates);
 export default router;

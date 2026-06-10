@@ -3,8 +3,9 @@ import Sidebar from "../components/sidebar.jsx";
 import { useEffect, useState } from "react";
 
 function Admin() {
-    const [projName, setptojName] = useState("");
+    
     // const [jd, setjd] = useState("");
+    const [projName, setptojName] = useState("");
     const [searchQuery, setSearchQuery] = useState("");
     const [receivedRecruiter, setreceivedRecruiter] = useState([]);
     const [file,setfile]=useState(null);
