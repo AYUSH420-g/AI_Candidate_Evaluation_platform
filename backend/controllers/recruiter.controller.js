@@ -354,15 +354,15 @@ const handleAnalyse = async (req,res)=>{
 
         let recommendation;
 
-        if(overallScore >= 85)
+        if(overallScore >= 75)
             recommendation =
                 "Highly Recommended";
 
-        else if(overallScore >= 70)
+        else if(overallScore >= 60)
             recommendation =
                 "Recommended";
 
-        else if(overallScore >= 50)
+        else if(overallScore >= 40)
             recommendation =
                 "Consider";
 
@@ -407,7 +407,8 @@ const handleAnalyse = async (req,res)=>{
                         overallScore.toFixed(2)
                     ),
 
-                recommendation
+                recommendation,
+                status: recommendation === "Reject" ? "Rejected" : "Pending"
             });
 
         return res.status(201).json({
@@ -431,7 +432,7 @@ const getCandidates=async(req,res)=>{
 
             const id=req.query.projectId;
            
-            const candidates = await candidateMatch.find({openingId:id}).select("candidateName");
+            const candidates = await candidateMatch.find({openingId:id}).select("candidateName status link");
 
             return res.status(200).json({
             candidates

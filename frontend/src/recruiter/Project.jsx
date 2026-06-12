@@ -15,6 +15,8 @@ function Project()
    
     const token=localStorage.getItem("token");
 
+
+
     const handleViewCandidates = async (projectId) => {
     try {
         if (openProject === projectId) {
@@ -188,18 +190,21 @@ function Project()
                             key={candidate._id}
                             className="rounded-lg border bg-[#f0f0f2] pt-2 pb-2 pl-4 shadow"
                         >
-                            <div className="flex justify-between items-center">
-                                <div>
-                                    <h3 className="font-normal">
-                                        {candidate.candidateName}
-                                    </h3>
+                            <div className="flex items-center justify-between p-3 border-b">
+                            <div>
+                                <h3 className="font-medium">
+                                    {candidate.candidateName}
+                                </h3>
 
-                                    <p className="text-sm text-gray-500">
-                                        Status: 
-                                    </p>
-                                </div>
+                                <p className="text-sm text-gray-500">
+                                    Status: {candidate.status}
+                                </p>
 
+                                <p className="text-sm text-gray-500">
+                                    link:{candidate.link?"Sent":"Pending"}
+                                </p>
                             </div>
+                        </div>
                         </div>
                     ))
                 ) : (

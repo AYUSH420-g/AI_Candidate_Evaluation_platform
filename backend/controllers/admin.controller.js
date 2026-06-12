@@ -271,6 +271,8 @@ const displaystatus=async (req,res)=>{
             missingSkills:1,
             candidateId:1,
             overallScore:1,
+            recommendation:1,
+            status:1
 
 
         })
@@ -286,6 +288,374 @@ const displaystatus=async (req,res)=>{
         console.log(e);
         return res.status(400);   
     }
+};
+
+const rejectCandidate=async(req,res)=>{
+
+    try{
+        // const status=req.body.status;
+
+        const update=await candidateMatch.findOneAndUpdate({candidateId:req.params.id},
+            { status: "Rejected" },
+            { returnDocument: "after" });
+
+            console.log(update);
+            res.status(200).json(update);
+    }
+    catch(err)
+    {
+        console.log(err);
+    }
+
+};
+
+const genQuestion=async(req,res)=>{
+
+    try{
+        const {candidateId}=req.body;
+        
+        const o_id=await candidateMatch.findOne({candidateId:candidateId},
+            {openingId:1,_id:0});
+        console.log(o_id.openingId);
+
+            
+        const text=await Opening.findById({_id:o_id.openingId},{
+            embeddingText:1
+        })
+
+        console.log(text);
+
+        const prompt = `
+            You are a STRICT JSON API.
+
+Your ONLY job is to generate interview questions.
+
+You MUST return EXACTLY 10 questions.
+
+If any rule is violated, regenerate internally before returning.
+
+==================================================
+MANDATORY DISTRIBUTION
+======================
+
+TOTAL QUESTIONS = 10
+
+EASY = 4 QUESTIONS
+
+* 2 Aptitude
+* 2 Technical
+
+MEDIUM = 3 QUESTIONS
+
+* 1 Aptitude
+* 2 Technical
+
+HARD = 3 QUESTIONS
+
+* 1 Aptitude
+* 2 Technical
+
+TOTAL:
+
+* Aptitude = 4
+* Technical = 6
+
+DO NOT RETURN UNTIL THESE COUNTS MATCH EXACTLY.
+
+==================================================
+QUESTION ORDER
+==============
+
+EASY
+
+Question 1 = Aptitude
+Question 2 = Aptitude
+Question 3 = Technical
+Question 4 = Technical
+
+MEDIUM
+
+Question 5 = Aptitude
+Question 6 = Technical
+Question 7 = Technical
+
+HARD
+
+Question 8 = Aptitude
+Question 9 = Technical
+Question 10 = Technical
+
+==================================================
+APTITUDE RULES
+==============
+
+Aptitude questions MUST NOT use any skill from the job description.
+
+Generate aptitude questions from:
+
+* Time and Work
+* Speed Distance
+* Train Problems
+* Clock Problems
+* Ages
+* Ratio
+* Percentage
+* Profit and Loss
+* Average
+* Simple Interest
+* Compound Interest
+
+Generate NEW questions.
+
+DO NOT copy examples.
+
+==================================================
+TECHNICAL RULES
+===============
+
+Technical questions MUST ONLY use skills from:
+
+${text}
+
+Generate technical questions from:
+
+* Syntax
+* Output Prediction
+* Fill In The Blank
+* Complete The Code
+* API Concepts
+* Database Queries
+* Framework Concepts
+* Language Fundamentals
+* Async Programming
+* OOP Concepts
+
+DO NOT ask generic theory questions.
+
+BAD:
+
+What is JavaScript?
+What is React?
+Explain Node.js.
+
+GOOD:
+
+What is the output?
+Complete the code.
+Which query returns...?
+Which hook should be used...?
+
+==================================================
+DIFFICULTY RULES
+================
+
+EASY
+
+* Basic syntax
+* Basic aptitude
+* Beginner interview questions
+
+MEDIUM
+
+* Code snippets
+* Output prediction
+* Moderate aptitude calculations
+
+HARD
+
+* Tricky code output
+* Async behaviour
+* Closures
+* Event loop
+* Aggregation
+* Complex aptitude calculations
+
+==================================================
+CODE QUESTION RULE
+==================
+
+If question type is:
+
+* Output prediction
+* Complete code
+* Fill in the blank
+* Find bug
+* Predict result
+
+THEN code field is REQUIRED.
+
+Example:
+
+{
+"question": "What is the output of the following code?",
+"code": "let x = '5' + 2; console.log(x);",
+"options": {
+"A": "7",
+"B": "52",
+"C": "Error",
+"D": "undefined"
+},
+"correctAnswer": "B",
+"type": "technical",
+"difficulty": "medium"
 }
 
-export {searchQuery,storeDetails,getStatus,displaystatus};
+NEVER generate output-based questions without a code field.
+
+==================================================
+NON-CODE QUESTION RULE
+======================
+
+For aptitude questions:
+
+DO NOT include code field.
+
+Example:
+
+{
+"question": "A train crosses a pole in 12 seconds...",
+"options": {
+"A": "100",
+"B": "120",
+"C": "150",
+"D": "180"
+},
+"correctAnswer": "B",
+"type": "aptitude",
+"difficulty": "easy"
+}
+
+==================================================
+OPTIONS RULES
+=============
+
+Every question MUST contain:
+
+A
+B
+C
+D
+
+Exactly ONE correct answer.
+
+Wrong answers must be realistic.
+
+Do not create obviously wrong options.
+
+==================================================
+QUESTION OBJECT FORMAT
+======================
+
+For code-based questions:
+
+{
+"question": "",
+"code": "",
+"options": {
+"A": "",
+"B": "",
+"C": "",
+"D": ""
+},
+"correctAnswer": "",
+"type": "technical",
+"difficulty": ""
+}
+
+For non-code questions:
+
+{
+"question": "",
+"options": {
+"A": "",
+"B": "",
+"C": "",
+"D": ""
+},
+"correctAnswer": "",
+"type": "",
+"difficulty": ""
+}
+
+==================================================
+OUTPUT FORMAT
+=============
+
+Return ONLY VALID JSON.
+
+{
+"easy": [],
+"medium": [],
+"hard": []
+}
+
+No markdown.
+
+No explanation.
+
+No notes.
+
+No code block.
+
+No text before JSON.
+
+No text after JSON.
+
+==================================================
+FINAL VALIDATION
+================
+
+Before returning verify:
+
+✓ Total Questions = 10
+
+✓ Easy = 4
+
+✓ Medium = 3
+
+✓ Hard = 3
+
+✓ Aptitude = 4
+
+✓ Technical = 6
+
+✓ Every question has A B C D
+
+✓ Exactly one correct answer
+
+✓ Code questions contain code field
+
+✓ Aptitude questions do NOT contain code field
+
+✓ JSON is valid
+
+If any validation fails, regenerate internally and return corrected JSON only.
+
+
+
+            `;
+
+        const response=await ollama.chat(
+            {
+                model:"llama3.2:3b",
+                messages:[
+                    {
+                        role: "user",
+                        content: prompt
+                    }
+                ],
+                format: "json"
+            }   
+        );
+
+        console.log(response);
+        return res.status(200).json({message:"received cid"});
+    }
+    catch(err)
+    {
+        console.log(err);
+    }
+
+};
+
+export {searchQuery,storeDetails,getStatus,displaystatus, rejectCandidate ,genQuestion};

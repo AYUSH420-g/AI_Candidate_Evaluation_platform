@@ -1,3 +1,4 @@
+import { request } from "express";
 import mongoose from "mongoose";
 
 const candidateMatchSchema = new mongoose.Schema(
@@ -9,7 +10,7 @@ const candidateMatchSchema = new mongoose.Schema(
 
     candidateName:{
         type:String,
-        required:true
+        // required:true
     },
 
     openingId:{
@@ -63,10 +64,37 @@ const candidateMatchSchema = new mongoose.Schema(
     }
     ,
     status:{
-        type:Number,
-        enum:[0,1,2],
-        default:0
-    }
+        type:String,
+        enum:["Pending", "Shortlisted", "Accepted", "Rejected"],
+        default:"Pending"
+    },
+
+    Questions:
+        [
+            {
+                question:{
+                    type:String,
+                    required:true
+                },
+                Options:{
+                    type:String,
+                    validate: {
+                        validator: function(v) {
+                            return v.length === 4;
+                        },
+            
+                    }
+                },
+                correctAnswer: {
+                    type: String
+                }
+            }
+        ],
+
+        link:{
+            type:Boolean,
+            default:false
+        }
 },
 {
     timestamps:true

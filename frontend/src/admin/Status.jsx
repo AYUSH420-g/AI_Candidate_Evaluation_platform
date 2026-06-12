@@ -7,7 +7,8 @@ function Status() {
     const [selectedProject, setSelectedProject] = useState(null);
     const [candidates, setCandidates] = useState([]);
     const [loading, setLoading] = useState(false);
-
+    const [expandedProject, setExpandedProject] = useState(null);
+    const [selectedCandidate, setSelectedCandidate] = useState(null);
     useEffect(() => {
         const fetchProjects = async () => {
             try {
@@ -39,6 +40,7 @@ function Status() {
             );
 
             setCandidates(res.data.response || []);
+            // console.log(res.data.response[0].recommendation);
         } catch (err) {
             console.log(err);
         } finally {
@@ -46,14 +48,39 @@ function Status() {
         }
     };
 
-    const handleAccept = (candidate) => {
-        console.log("Accepted:", candidate);
-        // API call here
+    const handleAccept = async (candidate) => {
+        const id=candidate.candidateId;
+        // console.log("from fe",id);
+        try{
+
+            const res=await axios.post("http://localhost:5010/admin/genquestion",
+                {
+                    candidateId:id
+                }
+
+            );
+            console.log(res.data);
+        }
+        catch(err)
+        {
+            console.log(err);
+        }
     };
 
-    const handleReject = (candidate) => {
-        console.log("Rejected:", candidate);
-        // API call here
+    const handleReject = async(candidate) => {
+
+        try{
+            const res=await axios.patch(`http://localhost:5010/admin/rejectcandidate/${candidate.candidateId}`);
+                
+             alert("Candidate Rejected");
+             console.log(res.data);
+            
+        }
+        catch(err)
+        {
+            console.log(err);
+        }
+
     };
 
     return (
@@ -61,156 +88,237 @@ function Status() {
             <Sidebar />
 
             <div className="ml-64 min-h-screen bg-gray-100 p-6">
-                <h1 className="mb-6 text-3xl font-semibold">
-                    Recruitment Dashboard
-                </h1>
+    <h1 className="mb-8 text-3xl font-bold text-gray-800">
+        Recruitment Dashboard
+    </h1>
 
-                <div className="grid grid-cols-12 gap-6">
-                    {/* LEFT SIDE PROJECTS */}
-                    <div className="col-span-4">
-                        <div className="rounded-xl bg-white p-5 shadow-md">
-                            <h2 className="mb-4 text-xl font-semibold">
-                                Projects
-                            </h2>
+    <div className="grid grid-cols-12 gap-6">
 
-                            {projects.length === 0 ? (
-                                <p>No projects found</p>
+            <div className="col-span-10">
+    <div className="rounded-2xl bg-white p-6 shadow-lg">
+        <h2 className="mb-6 text-2xl font-bold text-gray-800">
+            Job Openings
+        </h2>
+
+        {projects.length === 0 ? (
+            <div className="rounded-xl bg-gray-50 p-8 text-center text-gray-500">
+                No projects found
+            </div>
+        ) : (
+            projects.map((project) => (
+                <div
+                    key={project._id}
+                    className="mb-4 overflow-hidden rounded-2xl border border-gray-200 bg-gray-50 shadow-sm transition-all"
+                >
+                    {/* Project Header */}
+                    <button
+                        className="flex w-full items-center justify-between px-6 py-5 transition hover:bg-gray-100"
+                        onClick={() => {
+                            setExpandedProject(
+                                expandedProject === project._id
+                                    ? null
+                                    : project._id
+                            );
+
+                            if (
+                                expandedProject !== project._id
+                            ) {
+                                handleView(project);
+                            }
+                        }}
+                    >
+                        <div className="flex items-center gap-4">
+                            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100 text-lg font-bold text-blue-600">
+                                💼
+                            </div>
+
+                            <div className="text-left">
+                                <p className="text-lg font-semibold text-gray-800">
+                                    {project.projectName}
+                                </p>
+
+                                <p className="text-sm text-gray-400">
+                                    Click to view candidates
+                                </p>
+                            </div>
+                        </div>
+
+                        <div className="text-xl font-bold text-gray-500">
+                            {expandedProject === project._id
+                                ? "−"
+                                : "+"}
+                        </div>
+                    </button>
+
+                    {/* Candidates */}
+                    {expandedProject === project._id && (
+                        <div className="border-t bg-white">
+                            {loading ? (
+                                <div className="p-6 text-center text-gray-500">
+                                    Loading candidates...
+                                </div>
+                            ) : candidates.length === 0 ? (
+                                <div className="p-6 text-center text-gray-500">
+                                    No candidates found
+                                </div>
                             ) : (
-                                projects.map((project) => (
+                                candidates.map((candidate) => (
                                     <div
-                                        key={project._id}
-                                        className="mb-3 flex items-center justify-between rounded-lg border p-3"
+                                        key={candidate._id}
+                                        className="flex items-center justify-between border-b px-6 py-4 hover:bg-gray-50"
                                     >
-                                        <div>
-                                            <p className="font-medium">
-                                                {project.projectName}
-                                            </p>
+                                        <div className="flex items-center gap-4">
+                                            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-200 font-semibold text-gray-700">
+                                                {candidate.candidateName
+                                                    ?.charAt(
+                                                        0
+                                                    )
+                                                    .toUpperCase()}
+                                            </div>
+
+                                            <div>
+                                                <p className="font-medium text-gray-800">
+                                                    {
+                                                        candidate.candidateName
+                                                    }
+                                                </p>
+                                            </div>
                                         </div>
 
-                                        <button
-                                            onClick={() =>
-                                                handleView(project)
-                                            }
-                                            className="rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
-                                        >
-                                            View
-                                        </button>
+                                        <div className="flex items-center gap-4">
+                                          
+                                                <span
+                                                    className={`rounded-full px-3 py-1 text-sm font-medium ${
+                                                        candidate.status === "Rejected"
+                                                            ? "bg-red-100 text-red-700"
+                                                            : "bg-green-100 text-green-700"
+                                                    }`}
+                                                    >
+                                                    {candidate.status}
+                                                </span>
+                                             
+                                            
+                                            <button
+                                                onClick={() =>
+                                                    setSelectedCandidate(
+                                                        candidate
+                                                    )
+                                                }
+                                                className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-700"
+                                            >
+                                                 View
+                                            </button>
+                                        </div>
                                     </div>
-                                ))
+                                 ))
+                                 )}
+                                </div>
+                            )}
+                        </div>
+                    ))
+                )}
+            </div>
+        </div>
+
+            {selectedCandidate && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+                <div className="w-[650px] rounded-3xl bg-white p-8 shadow-2xl">
+                    <div className="mb-6 flex items-center justify-between">
+                        <h2 className="text-3xl font-bold text-gray-800">
+                            {selectedCandidate.candidateName}
+                        </h2>
+
+                        <button
+                            onClick={() =>
+                                setSelectedCandidate(null)
+                            }
+                            className="text-3xl text-gray-400 hover:text-red-500"
+                        >
+                            ×
+                        </button>
+                    </div>
+
+                    <div className="mb-6 rounded-xl bg-blue-50 p-5">
+                        <p className="text-lg font-semibold text-blue-400">
+                            Resume Match Score
+                        </p>
+
+                        <p className="mt-2 text-4xl font-bold text-blue-500">
+                            {Math.round(
+                                selectedCandidate.overallScore
+                            )}
+                            %
+                        </p>
+                    </div>
+
+                    <div className="mb-5">
+                        <h3 className="mb-3 text-lg font-semibold text-green-700">
+                            Matched Skills
+                        </h3>
+
+                        <div className="flex flex-wrap gap-2">
+                            {selectedCandidate.matchedSkills?.map(
+                                (skill, index) => (
+                                    <span
+                                        key={index}
+                                        className="rounded-full bg-green-100 px-3 py-2 text-sm text-green-700"
+                                    >
+                                        {skill}
+                                    </span>
+                                )
                             )}
                         </div>
                     </div>
 
-                    {/* RIGHT SIDE CANDIDATES */}
-                    <div className="col-span-8">
-                        {!selectedProject ? (
-                            <div className="rounded-xl bg-white p-10 text-center shadow-md">
-                                <h2 className="text-xl text-gray-500">
-                                    Select a project to view candidates
-                                </h2>
-                            </div>
-                        ) : (
-                            <>
-                                <div className="mb-5 rounded-xl bg-white p-5 shadow-md">
-                                    <h2 className="text-2xl font-semibold">
-                                        {selectedProject.projectName}
-                                    </h2>
-                                </div>
+                    <div className="mb-8">
+                        <h3 className="mb-3 text-lg font-semibold text-red-700">
+                            Missing Skills
+                        </h3>
 
-                                {loading ? (
-                                    <div className="rounded-xl bg-white p-10 text-center shadow-md">
-                                        Loading candidates...
-                                    </div>
-                                ) : (
-                                    <div className="grid gap-4 md:grid-cols-2">
-                                        {candidates.length === 0 ? (
-                                            <div className="rounded-xl bg-white p-6 shadow-md">
-                                                No candidates found
-                                            </div>
-                                        ) : (
-                                            candidates.map((candidate) => (
-                                                <div
-                                                    key={candidate._id}
-                                                    className="rounded-xl bg-white p-5 shadow-md"
-                                                >
-                                                    <h3 className="mb-3 text-lg font-semibold">
-                                                        {
-                                                            candidate.candidateName
-                                                        }
-                                                    </h3>
-
-                                                    <div className="mb-3">
-                                                        <p className="font-medium text-green-700">
-                                                            Matched Skills
-                                                        </p>
-
-                                                        <p className="text-sm text-gray-700">
-                                                            {candidate.matchedSkills
-                                                                ?.length > 0
-                                                                ? candidate.matchedSkills.join(
-                                                                      ", "
-                                                                  )
-                                                                : "No matched skills"}
-                                                        </p>
-                                                    </div>
-
-                                                    <div className="mb-3">
-                                                        <p className="font-medium text-red-700">
-                                                            Missing Skills
-                                                        </p>
-
-                                                        <p className="text-sm text-gray-700">
-                                                            {candidate.missingSkills
-                                                                ?.length > 0
-                                                                ? candidate.missingSkills.join(
-                                                                      ", "
-                                                                  )
-                                                                : "No missing skills"}
-                                                        </p>
-                                                    </div>
-
-                                                    <p className="mb-4 text-lg font-bold text-blue-600">
-                                                        Score:{" "}
-                                                        {Math.round(
-                                                            candidate.overallScore
-                                                        )}
-                                                        %
-                                                    </p>
-
-                                                    <div className="flex gap-3">
-                                                        {candidate.overallScore >=
-                                                            35 && (
-                                                            <button
-                                                                onClick={() =>
-                                                                    handleAccept(
-                                                                        candidate
-                                                                    )
-                                                                }
-                                                                className="rounded-lg bg-green-600 px-4 py-2 text-white hover:bg-green-700"
-                                                            >
-                                                                Accept
-                                                            </button>
-                                                        )}
-
-                                                        <button
-                                                            onClick={() =>
-                                                                handleReject(
-                                                                    candidate
-                                                                )
-                                                            }
-                                                            className="rounded-lg bg-red-600 px-4 py-2 text-white hover:bg-red-700"
-                                                        >
-                                                            Reject
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            ))
-                                        )}
-                                    </div>
-                                )}
-                            </>
-                        )}
+                        <div className="flex flex-wrap gap-2">
+                            {selectedCandidate.missingSkills?.map(
+                                (skill, index) => (
+                                    <span
+                                        key={index}
+                                        className="rounded-full bg-red-50 px-3 py-2 text-sm text-red-500"
+                                    >
+                                        {skill}
+                                    </span>
+                                )
+                            )}
+                        </div>
                     </div>
+
+                    {selectedCandidate.recommendation !== "Reject" && selectedCandidate.status !== "Rejected" ? (
+                    <div className="flex gap-4">
+                        <button
+                            onClick={() =>
+                                handleAccept(selectedCandidate)
+                            }
+                            className="rounded-xl bg-green-600 px-6 py-3 font-medium text-white transition hover:bg-green-700"
+                        >
+                            ✓ Accept
+                        </button>
+
+                        <button
+                            onClick={() =>
+                                handleReject(selectedCandidate)
+                            }
+                            className="rounded-xl bg-red-600 px-6 py-3 font-medium text-white transition hover:bg-red-700"
+                        >
+                            ✕ Reject
+                        </button>
+
+                        
+                    </div>
+                    ):(
+                             <span className="rounded-xl bg-red-200 px-4 py-2 font-medium text-red-700">
+                                Rejected
+                            </span>
+                    )}
+                </div>
+            </div>
+        )}
                 </div>
             </div>
         </>
