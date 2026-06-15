@@ -34,7 +34,7 @@ function Status() {
                 "http://localhost:5010/admin/displaystatus",
                 {
                     params: {
-                        id: project._id,
+                        id: project._id,  
                     },
                 }
             );
@@ -289,33 +289,52 @@ function Status() {
                         </div>
                     </div>
 
-                    {selectedCandidate.recommendation !== "Reject" && selectedCandidate.status !== "Rejected" ? (
-                    <div className="flex gap-4">
-                        <button
-                            onClick={() =>
-                                handleAccept(selectedCandidate)
-                            }
-                            className="rounded-xl bg-green-600 px-6 py-3 font-medium text-white transition hover:bg-green-700"
-                        >
-                            ✓ Accept
-                        </button>
+                    {
+                        selectedCandidate.link==true ?(<div></div>):(<div></div>)
+                    }
 
-                        <button
-                            onClick={() =>
-                                handleReject(selectedCandidate)
-                            }
-                            className="rounded-xl bg-red-600 px-6 py-3 font-medium text-white transition hover:bg-red-700"
-                        >
-                            ✕ Reject
-                        </button>
+                    {selectedCandidate.recommendation !== "Reject" &&
+selectedCandidate.status !== "Rejected" ? (
+    <>
+        {selectedCandidate.link && (
+            <div className="mb-4 rounded-xl bg-yellow-100 p-3 text-sm font-medium text-yellow-700">
+                Questions already generated for this candidate.
+            </div>
+        )}
 
-                        
-                    </div>
-                    ):(
-                             <span className="rounded-xl bg-red-200 px-4 py-2 font-medium text-red-700">
-                                Rejected
-                            </span>
-                    )}
+        <div
+            className={`flex gap-4 ${
+                selectedCandidate.link
+                    ? "pointer-events-none opacity-50 blur-[1px]"
+                    : ""
+            }`}
+        >
+            <button
+                onClick={() =>
+                    handleAccept(selectedCandidate)
+                }
+                disabled={selectedCandidate.link}
+                className="rounded-xl bg-green-600 px-6 py-3 font-medium text-white transition hover:bg-green-700"
+            >
+                ✓ Accept
+            </button>
+
+            <button
+                onClick={() =>
+                    handleReject(selectedCandidate)
+                }
+                disabled={selectedCandidate.link}
+                className="rounded-xl bg-red-600 px-6 py-3 font-medium text-white transition hover:bg-red-700"
+            >
+                ✕ Reject
+            </button>
+        </div>
+    </>
+) : (
+    <span className="rounded-xl bg-red-200 px-4 py-2 font-medium text-red-700">
+        Rejected
+    </span>
+)}
                 </div>
             </div>
         )}

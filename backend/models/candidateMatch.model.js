@@ -69,36 +69,117 @@ const candidateMatchSchema = new mongoose.Schema(
         default:"Pending"
     },
 
-    Questions:
-        [
-            {
-                question:{
-                    type:String,
-                    required:true
-                },
-                Options:{
-                    type:String,
-                    validate: {
-                        validator: function(v) {
-                            return v.length === 4;
-                        },
-            
-                    }
-                },
-                correctAnswer: {
-                    type: String
-                }
-            }
-        ],
+    Questions: {
+  easy: [
+    {
+      question: String,
 
-        link:{
-            type:Boolean,
-            default:false
-        }
+      code: {
+        type: String,
+        default: ""
+      },
+
+      options: {
+        A: String,
+        B: String,
+        C: String,
+        D: String
+      },
+
+      correctAnswer: {
+        type: String,
+        enum: ["A", "B", "C", "D"]
+      },
+
+      type: {
+        type: String,
+        enum: ["aptitude", "technical"]
+      },
+
+      difficulty: {
+        type: String,
+        enum: ["easy", "medium", "hard"]
+      }
+    }
+  ],
+
+  medium: [
+    {
+      question: String,
+
+      code: {
+        type: String,
+        default: ""
+      },
+
+      options: {
+        A: String,
+        B: String,
+        C: String,
+        D: String
+      },
+
+      correctAnswer: {
+        type: String,
+        enum: ["A", "B", "C", "D"]
+      },
+
+      type: {
+        type: String,
+        enum: ["aptitude", "technical"]
+      },
+
+      difficulty: {
+        type: String,
+        enum: ["easy", "medium", "hard"]
+      }
+    }
+  ],
+
+  hard: [
+    {
+      question: String,
+
+      code: {
+        type: String,
+        default: ""
+      },
+
+      options: {
+        A: String,
+        B: String,
+        C: String,
+        D: String
+      },
+
+      correctAnswer: {
+        type: String,
+        enum: ["A", "B", "C", "D",""]
+      },
+
+      type: {
+        type: String,
+        enum: ["aptitude", "technical"]
+      },
+
+      difficulty: {
+        type: String,
+        enum: ["easy", "medium", "hard"]
+      }
+    }
+  ]
+},
+
+
+    link: {
+    type: Boolean,
+    default: false
+    }
 },
 {
     timestamps:true
 });
+
 
 export default mongoose.model(
     "CandidateMatch",

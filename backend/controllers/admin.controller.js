@@ -272,7 +272,8 @@ const displaystatus=async (req,res)=>{
             candidateId:1,
             overallScore:1,
             recommendation:1,
-            status:1
+            status:1,
+            link:1
 
 
         })
@@ -328,75 +329,81 @@ const genQuestion=async(req,res)=>{
         const prompt = `
             You are a STRICT JSON API.
 
-Your ONLY job is to generate interview questions.
+Your ONLY task is to generate interview questions.
 
-You MUST return EXACTLY 10 questions.
+IMPORTANT:
 
-If any rule is violated, regenerate internally before returning.
+* Return ONLY valid JSON.
+* No markdown.
+* No explanations.
+* No notes.
+* No text before JSON.
+* No text after JSON.
+* Output must be directly parsable by JSON.parse().
 
 ==================================================
-MANDATORY DISTRIBUTION
-======================
+INPUT
+=====
 
-TOTAL QUESTIONS = 10
+The technical skills, frameworks, languages, and tools will be provided in:
 
-EASY = 4 QUESTIONS
+${text}
+
+Generate questions ONLY from skills mentioned in ${text}.
+
+Do NOT use any technology that is not present in ${text}.
+
+==================================================
+QUESTION COUNT (MANDATORY)
+==========================
+
+Generate EXACTLY 10 questions.
+
+Distribution:
+
+Easy = 4 Questions
 
 * 2 Aptitude
 * 2 Technical
 
-MEDIUM = 3 QUESTIONS
+Medium = 3 Questions
 
 * 1 Aptitude
 * 2 Technical
 
-HARD = 3 QUESTIONS
+Hard = 3 Questions
 
 * 1 Aptitude
 * 2 Technical
 
-TOTAL:
+Total:
 
 * Aptitude = 4
 * Technical = 6
 
-DO NOT RETURN UNTIL THESE COUNTS MATCH EXACTLY.
+
 
 ==================================================
-QUESTION ORDER
-==============
+EXPERIENCE LEVEL
+================
 
-EASY
+Assume candidate has 3-5 years of professional experience.
 
-Question 1 = Aptitude
-Question 2 = Aptitude
-Question 3 = Technical
-Question 4 = Technical
+Questions should be realistic interview questions asked to experienced developers.
 
-MEDIUM
-
-Question 5 = Aptitude
-Question 6 = Technical
-Question 7 = Technical
-
-HARD
-
-Question 8 = Aptitude
-Question 9 = Technical
-Question 10 = Technical
+Avoid fresher-level generic theory questions.
 
 ==================================================
 APTITUDE RULES
 ==============
 
-Aptitude questions MUST NOT use any skill from the job description.
+Aptitude questions MUST NOT use any technology from ${text}.
 
-Generate aptitude questions from:
+Generate aptitude questions from topics such as:
 
 * Time and Work
 * Speed Distance
 * Train Problems
-* Clock Problems
 * Ages
 * Ratio
 * Percentage
@@ -404,125 +411,88 @@ Generate aptitude questions from:
 * Average
 * Simple Interest
 * Compound Interest
+* Probability
+* Mixture and Allegation
 
-Generate NEW questions.
+Requirements:
 
-DO NOT copy examples.
+* Numerical aptitude only.
+* Moderate to challenging interview level.
+* Must have exactly one correct answer.
+* No code field.
 
 ==================================================
 TECHNICAL RULES
 ===============
 
-Technical questions MUST ONLY use skills from:
+Technical questions MUST be generated ONLY from technologies found in ${text}.
 
-${text}
+Preferred question styles:
 
-Generate technical questions from:
-
-* Syntax
 * Output Prediction
-* Fill In The Blank
 * Complete The Code
-* API Concepts
-* Database Queries
-* Framework Concepts
-* Language Fundamentals
-* Async Programming
-* OOP Concepts
-
-DO NOT ask generic theory questions.
-
-BAD:
-
-What is JavaScript?
-What is React?
-Explain Node.js.
-
-GOOD:
-
-What is the output?
-Complete the code.
-Which query returns...?
-Which hook should be used...?
-
-==================================================
-DIFFICULTY RULES
-================
-
-EASY
-
-* Basic syntax
-* Basic aptitude
-* Beginner interview questions
-
-MEDIUM
-
-* Code snippets
-* Output prediction
-* Moderate aptitude calculations
-
-HARD
-
-* Tricky code output
-* Async behaviour
-* Closures
-* Event loop
+* Fill In The Blank
+* Find Bug
+* API Design
+* Database Query
 * Aggregation
-* Complex aptitude calculations
+* Async Programming
+* Closures
+* OOP Concepts
+* Framework Behavior
+* Middleware Concepts
+* Query Optimization
+* State Management
+* Promise Handling
+
+Avoid generic questions like:
+
+❌ What is JavaScript?
+❌ Explain React.
+❌ What is Node.js?
+
+Prefer:
+
+✅ What is the output?
+✅ Which query returns the correct result?
+✅ Complete the missing code.
+✅ Which API behavior is correct?
+✅ Which middleware executes first?
+✅ Which aggregation pipeline returns the expected result?
 
 ==================================================
 CODE QUESTION RULE
 ==================
 
-If question type is:
+For any of the following:
 
-* Output prediction
-* Complete code
-* Fill in the blank
-* Find bug
-* Predict result
+* Output Prediction
+* Complete Code
+* Fill In The Blank
+* Debugging
+* Find Bug
+* Predict Result
+* Async Behavior
+* Closure Question
 
-THEN code field is REQUIRED.
+A "code" field is REQUIRED.
+
+Never generate these question types without code.
 
 Example:
 
 {
-"question": "What is the output of the following code?",
-"code": "let x = '5' + 2; console.log(x);",
+"question": "What is the output?",
+"code": "console.log(typeof null)",
 "options": {
-"A": "7",
-"B": "52",
-"C": "Error",
-"D": "undefined"
+"A": "null",
+"B": "object",
+"C": "undefined",
+"D": "number"
 },
 "correctAnswer": "B",
 "type": "technical",
 "difficulty": "medium"
-}
-
-NEVER generate output-based questions without a code field.
-
-==================================================
-NON-CODE QUESTION RULE
-======================
-
-For aptitude questions:
-
-DO NOT include code field.
-
-Example:
-
-{
-"question": "A train crosses a pole in 12 seconds...",
-"options": {
-"A": "100",
-"B": "120",
-"C": "150",
-"D": "180"
-},
-"correctAnswer": "B",
-"type": "aptitude",
-"difficulty": "easy"
 }
 
 ==================================================
@@ -531,22 +501,26 @@ OPTIONS RULES
 
 Every question MUST contain:
 
-A
-B
-C
-D
+{
+"A": "...",
+"B": "...",
+"C": "...",
+"D": "..."
+}
 
-Exactly ONE correct answer.
+Requirements:
 
-Wrong answers must be realistic.
-
-Do not create obviously wrong options.
+* Exactly 4 options.
+* Exactly 1 correct answer.
+* Wrong answers must be realistic.
+* Wrong answers should be confusing and close to the correct answer.
+* Avoid obviously wrong choices.
 
 ==================================================
 QUESTION OBJECT FORMAT
 ======================
 
-For code-based questions:
+CODE QUESTION
 
 {
 "question": "",
@@ -557,12 +531,12 @@ For code-based questions:
 "C": "",
 "D": ""
 },
-"correctAnswer": "",
+"correctAnswer": "A",
 "type": "technical",
-"difficulty": ""
+"difficulty": "easy"
 }
 
-For non-code questions:
+NON-CODE QUESTION
 
 {
 "question": "",
@@ -572,42 +546,63 @@ For non-code questions:
 "C": "",
 "D": ""
 },
-"correctAnswer": "",
-"type": "",
-"difficulty": ""
+"correctAnswer": "A",
+"type": "aptitude",
+"difficulty": "easy"
 }
 
 ==================================================
 OUTPUT FORMAT
 =============
 
-Return ONLY VALID JSON.
-
 {
-"easy": [],
-"medium": [],
-"hard": []
+"easy": [
+{},
+{},
+{},
+{}
+],
+"medium": [
+{},
+{},
+{}
+],
+"hard": [
+{},
+{},
+{}
+]
 }
 
-No markdown.
+==================================================
+ORDER RULE (MANDATORY)
+======================
 
-No explanation.
+Easy:
+1 = Aptitude
+2 = Aptitude
+3 = Technical
+4 = Technical
 
-No notes.
+Medium:
+5 = Aptitude
+6 = Technical
+7 = Technical
 
-No code block.
-
-No text before JSON.
-
-No text after JSON.
+Hard:
+8 = Aptitude
+9 = Technical
+10 = Technical
 
 ==================================================
 FINAL VALIDATION
 ================
 
-Before returning verify:
+Before returning:
 
-✓ Total Questions = 10
+✓ Valid JSON
+
+✓ Exactly 10 Questions
 
 ✓ Easy = 4
 
@@ -619,7 +614,9 @@ Before returning verify:
 
 ✓ Technical = 6
 
-✓ Every question has A B C D
+✓ Technical questions only from ${text}
+
+✓ Every question has A,B,C,D
 
 ✓ Exactly one correct answer
 
@@ -627,7 +624,7 @@ Before returning verify:
 
 ✓ Aptitude questions do NOT contain code field
 
-✓ JSON is valid
+✓ JSON.parse(output) must succeed
 
 If any validation fails, regenerate internally and return corrected JSON only.
 
@@ -648,8 +645,29 @@ If any validation fails, regenerate internally and return corrected JSON only.
             }   
         );
 
-        console.log(response);
-        return res.status(200).json({message:"received cid"});
+
+        const data=JSON.parse(response.message.content);
+        console.log(data);
+
+        const updated = await candidateMatch.findOneAndUpdate(
+        {
+            candidateId,
+            openingId: o_id.openingId
+        },
+        {
+            $set: {
+            Questions: data,
+            link: true
+            }
+        },
+        {
+            returnDocument: "after",
+            runValidators: true
+        }
+        );
+
+        console.log(updated);
+        res.status(200).json(updated);
     }
     catch(err)
     {
