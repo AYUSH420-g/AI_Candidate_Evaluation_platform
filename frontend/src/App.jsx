@@ -5,6 +5,7 @@ import Login from "./Login";
 import Opening from "./admin/Opening";
 import Project from "./recruiter/Project";
 import Status from "./admin/Status";
+import Interview from "./Interview";
 
 function App() {
   
@@ -17,6 +18,7 @@ function App() {
         <Route path="/Opening" element={<Opening/>}/>
         <Route path="/Project" element={<Project/>}/>
         <Route path="/Status" element={<Status/>}/>
+        <Route path="/interview/:id" element={<Interview/>}/>
       </Routes>
     </BrowserRouter>
   );

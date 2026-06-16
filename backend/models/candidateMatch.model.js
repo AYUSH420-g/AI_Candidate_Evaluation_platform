@@ -174,6 +174,11 @@ const candidateMatchSchema = new mongoose.Schema(
     link: {
     type: Boolean,
     default: false
+    },
+
+    link_url:{
+      type:String,
+      default: null
     }
 },
 {

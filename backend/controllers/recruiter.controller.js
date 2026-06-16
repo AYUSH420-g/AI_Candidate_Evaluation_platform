@@ -432,7 +432,7 @@ const getCandidates=async(req,res)=>{
 
             const id=req.query.projectId;
            
-            const candidates = await candidateMatch.find({openingId:id}).select("candidateName status link");
+            const candidates = await candidateMatch.find({openingId:id}).select("candidateName status link link_url");
 
             return res.status(200).json({
             candidates

@@ -324,7 +324,25 @@ const genQuestion=async(req,res)=>{
             embeddingText:1
         })
 
-        console.log(text);
+        // console.log(text);
+
+        function generate() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+
+            let str = '';
+            for (let i = 0; i < 5; i++) {
+                str += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+
+            let num = '';
+            for (let i = 0; i < 5; i++) {
+                num += Math.floor(Math.random() * 10);
+            }
+
+            return `${str}#${num}`;
+        }
+
+        const url=generate();
 
         const prompt = `
             You are a STRICT JSON API.
@@ -657,7 +675,8 @@ If any validation fails, regenerate internally and return corrected JSON only.
         {
             $set: {
             Questions: data,
-            link: true
+            link: true,
+            link_url:url
             }
         },
         {

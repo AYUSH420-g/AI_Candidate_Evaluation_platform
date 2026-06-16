@@ -201,7 +201,7 @@ function Project()
                                 </p>
 
                                 <p className="text-sm text-gray-500">
-                                    link:{candidate.link?"Sent":"Pending"}
+                                    link:{candidate.link?`http://localhost:3000/interview/${candidate.link_url}`:"Pending"}
                                 </p>
                             </div>
                         </div>
