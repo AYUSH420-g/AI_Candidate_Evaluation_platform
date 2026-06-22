@@ -273,7 +273,10 @@ const displaystatus=async (req,res)=>{
             overallScore:1,
             recommendation:1,
             status:1,
-            link:1
+            link:1,
+            testScore:1,
+            totalQuestions:1,
+            testSubmitted:1
 
 
         })

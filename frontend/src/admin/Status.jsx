@@ -9,6 +9,7 @@ function Status() {
     const [loading, setLoading] = useState(false);
     const [expandedProject, setExpandedProject] = useState(null);
     const [selectedCandidate, setSelectedCandidate] = useState(null);
+    const [acceptLoading, setAcceptLoading] = useState(false);
     useEffect(() => {
         const fetchProjects = async () => {
             try {
@@ -52,7 +53,7 @@ function Status() {
         const id=candidate.candidateId;
         // console.log("from fe",id);
         try{
-
+             setAcceptLoading(true);
             const res=await axios.post("http://localhost:5010/admin/genquestion",
                 {
                     candidateId:id
@@ -64,6 +65,9 @@ function Status() {
         catch(err)
         {
             console.log(err);
+        }
+        finally {
+            setAcceptLoading(false);
         }
     };
 
@@ -251,6 +255,20 @@ function Status() {
                         </p>
                     </div>
 
+                    {selectedCandidate.testSubmitted && (
+                      <div className="mb-6 rounded-xl bg-purple-50 p-5">
+                        <p className="text-lg font-semibold text-purple-400">
+                          Interview Test Score
+                        </p>
+                        <p className="mt-2 text-4xl font-bold text-purple-600">
+                          {selectedCandidate.testScore} / {selectedCandidate.totalQuestions}
+                        </p>
+                        <p className="mt-1 text-sm text-purple-400">
+                          {Math.round((selectedCandidate.testScore / selectedCandidate.totalQuestions) * 100)}% correct
+                        </p>
+                      </div>
+                    )}
+
                     <div className="mb-5">
                         <h3 className="mb-3 text-lg font-semibold text-green-700">
                             Matched Skills
@@ -310,13 +328,23 @@ selectedCandidate.status !== "Rejected" ? (
             }`}
         >
             <button
-                onClick={() =>
-                    handleAccept(selectedCandidate)
-                }
-                disabled={selectedCandidate.link}
-                className="rounded-xl bg-green-600 px-6 py-3 font-medium text-white transition hover:bg-green-700"
-            >
-                ✓ Accept
+                onClick={() => handleAccept(selectedCandidate)}
+                disabled={selectedCandidate.link || acceptLoading}
+                className={`rounded-xl px-6 py-3 font-medium text-white transition
+                    ${
+                    selectedCandidate.link || acceptLoading
+                        ? "bg-green-400 cursor-not-allowed"
+                        : "bg-green-600 hover:bg-green-700"
+                    }`}
+                >
+                {acceptLoading ? (
+                    <div className="flex items-center gap-2">
+                    <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
+                    Accepting...
+                    </div>
+                ) : (
+                    "✓ Accept"
+                )}
             </button>
 
             <button

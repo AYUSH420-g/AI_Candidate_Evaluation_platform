@@ -12,6 +12,7 @@ function Admin() {
 
     const [selectedRecruiterIds, setSelectedRecruiterIds] = useState([]);
     const [selectedRecruiterObjects, setSelectedRecruiterObjects] = useState([]);
+    const [loading, setLoading] = useState(false);
     const token=localStorage.getItem("token");
 
     async function handleOpening(e) {
@@ -29,6 +30,8 @@ function Admin() {
                 alert("Please select a PDF");
                 return;
             }
+
+            setLoading(true);
             const formData=new FormData();
             formData.append('jobDesc',file);
             formData.append('projectName',projName);
@@ -52,6 +55,9 @@ function Admin() {
         } catch (err) {
             console.error(err);
             alert("Failed to submit opening data.");
+        }
+        finally{
+            setLoading(false);
         }
     }
 
@@ -166,9 +172,15 @@ function Admin() {
 
                         <button
                             type="submit"
-                            className="w-60 rounded-lg bg-blue-600 py-3 font-semibold text-white transition hover:bg-blue-700"
-                        >
-                            Send to Recruiters
+                            disabled={loading}
+                            className={`w-60 rounded-lg py-3 font-semibold text-white transition
+                                ${
+                                    loading
+                                        ? "bg-gray-400 cursor-not-allowed"
+                                        : "bg-blue-600 hover:bg-blue-700"
+                                }`}
+                                    >
+                            {loading ? "Sending..." : "Send to Recruiters"}
                         </button>
                     </form>
                 </div>

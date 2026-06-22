@@ -12,6 +12,7 @@ function Project()
     const [successMsg, setSuccessMsg] = useState("");
     const [openProject, setOpenProject] = useState(null);
     const [candidateMap, setCandidateMap] = useState({});
+    const [loading, setLoading] = useState(false);
    
     const token=localStorage.getItem("token");
 
@@ -70,7 +71,7 @@ function Project()
             alert("CV is required");
             return;
         }
-
+        setLoading(true);
         const formData = new FormData();
 
         formData.append("candidateCv", cv);
@@ -100,6 +101,9 @@ function Project()
     }
     catch (e) {
         console.log(e);
+    }
+    finally{
+        setLoading(false);
     }
 }
 
@@ -254,10 +258,22 @@ function Project()
                 </button>
 
                 <button
-                    className="rounded-lg bg-blue-600 px-4 py-2 text-white"
+                    className={`rounded-lg px-4 py-2 text-white ${
+                        loading
+                            ? "bg-blue-400 cursor-not-allowed"
+                            : "bg-blue-600 hover:bg-blue-700"
+                    }`}
                     onClick={handleCandidate}
+                    disabled={loading}
                 >
-                    Save
+                    {loading ? (
+                        <div className="flex items-center gap-2">
+                            <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
+                            Saving...
+                        </div>
+                    ) : (
+                        "Save"
+                    )}
                 </button>
                     </div>
                 </div>

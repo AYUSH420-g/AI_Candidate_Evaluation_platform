@@ -91,6 +91,12 @@ const candidateMatchSchema = new mongoose.Schema(
         enum: ["A", "B", "C", "D"]
       },
 
+      selectedAnswer:{
+        type: String,
+        enum: ["A", "B", "C", "D"],
+        default: null
+      },
+
       type: {
         type: String,
         enum: ["aptitude", "technical"]
@@ -123,7 +129,12 @@ const candidateMatchSchema = new mongoose.Schema(
         type: String,
         enum: ["A", "B", "C", "D"]
       },
-
+      selectedAnswer:{
+        type: String,
+        enum: ["A", "B", "C", "D"],
+        default: null
+      }
+      ,
       type: {
         type: String,
         enum: ["aptitude", "technical"]
@@ -157,6 +168,12 @@ const candidateMatchSchema = new mongoose.Schema(
         enum: ["A", "B", "C", "D",""]
       },
 
+      selectedAnswer:{
+        type: String,
+        enum: ["A", "B", "C", "D"],
+        default: null
+      },
+
       type: {
         type: String,
         enum: ["aptitude", "technical"]
@@ -179,6 +196,21 @@ const candidateMatchSchema = new mongoose.Schema(
     link_url:{
       type:String,
       default: null
+    },
+
+    testScore:{
+      type:Number,
+      default: null
+    },
+
+    totalQuestions:{
+      type:Number,
+      default: null
+    },
+
+    testSubmitted:{
+      type:Boolean,
+      default:false
     }
 },
 {

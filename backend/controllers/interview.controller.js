@@ -24,6 +24,7 @@ const displayquestions = async (req, res) => {
       ...candidate.Questions.hard
     ].map((q, index) => ({
       id: index + 1,
+      _id:q._id,
       question: q.question,
       code: q.code,
       options: q.options,
@@ -45,4 +46,69 @@ const displayquestions = async (req, res) => {
   }
 };
 
-export { displayquestions };
+const submitInterview = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { answers, code } = req.body;
+
+    const candidate =
+      await candidateMatch.findOne({
+        link_url: `${id}#${code}`
+      });
+
+    if (!candidate) {
+      return res
+        .status(404)
+        .json({ message: "Candidate not found" });
+    }
+
+    let score = 0;
+
+    const allQuestions = [
+      ...candidate.Questions.easy,
+      ...candidate.Questions.medium,
+      ...candidate.Questions.hard
+    ];
+
+    allQuestions.forEach((question) => {
+
+      const selectedAnswer =
+        answers[question._id.toString()];
+
+      if (selectedAnswer) {
+        question.selectedAnswer =
+          selectedAnswer;
+
+        if (
+          selectedAnswer ===
+          question.correctAnswer
+        ) {
+          score++;
+        }
+      }
+    });
+
+    candidate.testScore = score;
+    candidate.totalQuestions = allQuestions.length;
+    candidate.testSubmitted = true;
+
+    await candidate.save();
+
+    res.status(200).json({
+      success: true,
+      score,
+      totalQuestions:
+        allQuestions.length
+    });
+
+  } catch (error) {
+    console.log(error);
+
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+};
+
+export { displayquestions,submitInterview };
