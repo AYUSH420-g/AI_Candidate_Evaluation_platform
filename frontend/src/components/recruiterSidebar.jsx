@@ -1,47 +1,46 @@
-import { useNavigate ,useLocation} from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
+import { FolderOpen } from "lucide-react";
+
 function RecruiterSidebar() {
+  const navigate = useNavigate();
+  const location = useLocation();
 
-    function handleProject() {
-        navigate("/Project");
-    }
+  const links = [
+    { label: "Projects", path: "/Project", icon: FolderOpen },
+  ];
 
-    const navigate = useNavigate();
-    const location=useLocation();
+  return (
+    <div className="fixed left-0 top-0 flex h-screen w-64 flex-col border-r border-gray-200 bg-white px-3 py-5">
+      <div className="mb-8 px-3">
+        <p className="text-xs font-medium uppercase tracking-widest text-gray-400">
+          Recruiter
+        </p>
+        <h1 className="mt-0.5 text-base font-medium text-gray-900">
+          Dashboard
+        </h1>
+      </div>
 
-    return (
-        <div className="fixed left-0 top-0 flex h-screen w-64 flex-col bg-gray-100 border p-4 text-black">
-
-            <h1 className="mb-8 text-2xl font-bold">
-                Recruiter Dashboard
-            </h1>
-
+      <nav className="flex flex-col gap-1">
+        {links.map(({ label, path, icon: Icon }) => {
+          const active = location.pathname === path;
+          return (
             <button
-                onClick={handleProject}
-                className={`mb-3 rounded-lg px-4 py-3 text-left hover:bg-gray-300 ${
-                    location.pathname==="/Project" ?"bg-gray-300 text-black"
-                    :"hover:bg-gray-100 text-black"
-                }`}
+              key={path}
+              onClick={() => navigate(path)}
+              className={`flex items-center gap-2.5 rounded-lg px-3 py-2.5 text-left text-sm transition-colors ${
+                active
+                  ? "bg-gray-100 font-medium text-gray-900"
+                  : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
+              }`}
             >
-                Project
+              <Icon size={16} className={active ? "text-gray-900" : "text-gray-400"} />
+              {label}
             </button>
-
-            {/* <button className="mb-3 rounded-lg px-4 py-3 text-left hover:bg-gray-300">
-                A
-            </button>
-
-            <button className="mb-3 rounded-lg px-4 py-3 text-left hover:bg-gray-300">
-                B
-            </button>
-
-            <button className="mb-3 rounded-lg px-4 py-3 text-left hover:bg-gray-300">
-                C
-            </button>
-
-            <button className="rounded-lg px-4 py-3 text-left hover:bg-gray-300">
-                D
-            </button> */}
-
-        </div>
-    );
+          );
+        })}
+      </nav>
+    </div>
+  );
 }
+
 export default RecruiterSidebar;

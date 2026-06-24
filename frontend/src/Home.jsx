@@ -1,29 +1,44 @@
-import { useNavigate } from "react-router-dom";
-import { Link } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 function Home() {
   const navigate = useNavigate();
 
-  function handleAuth() {
-    navigate("/Signup");
-  }
-
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 px-4">
-      <div className="bg-white shadow-lg rounded-2xl p-10 text-center max-w-lg w-full">
-        <h1 className="text-4xl font-bold text-gray-800 mb-6">
-          Welcome to AI Candidate Evaluator
-        </h1>
+    <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4">
+      <div className="w-full max-w-md text-center">
 
-        
+        <div className="mb-8">
+          <p className="mb-2 text-xs font-medium uppercase tracking-widest text-gray-400">
+            AI-powered hiring
+          </p>
+          <h1 className="text-3xl font-medium text-gray-900">
+            Candidate Evaluator
+          </h1>
+          <p className="mt-3 text-sm leading-relaxed text-gray-500">
+            Streamline your recruitment pipeline with intelligent CV screening,
+            automated scoring, and structured interviews.
+          </p>
+        </div>
 
-        <button
-          onClick={handleAuth}
-          className="bg-blue-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-blue-700 transition duration-300"
-        >
-          Sign Up
-        </button>
-        <p>already have an account? <Link to="/Login" className="text-blue-600 hover:underline">Login</Link> </p>
+        <div className="rounded-xl border border-gray-200 bg-white p-8">
+          <button
+            onClick={() => navigate("/Signup")}
+            className="w-full rounded-lg bg-gray-900 py-2.5 text-sm font-medium text-white transition-opacity hover:opacity-80"
+          >
+            Get started
+          </button>
+
+          <p className="mt-4 text-sm text-gray-400">
+            Already have an account?{" "}
+            <Link
+              to="/Login"
+              className="font-medium text-gray-700 underline-offset-2 hover:underline"
+            >
+              Log in
+            </Link>
+          </p>
+        </div>
+
       </div>
     </div>
   );

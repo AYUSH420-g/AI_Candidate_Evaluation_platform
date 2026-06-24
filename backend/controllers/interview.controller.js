@@ -5,8 +5,8 @@ const displayquestions = async (req, res) => {
     const { id } = req.params;
     const { code } = req.query;
 
-    console.log("Interview Id:", id);
-    console.log("Code:", code);
+    // console.log("Interview Id:", id);
+    // console.log("Code:", code);
 
     const candidate = await candidateMatch.findOne({
       link_url: `${id}#${code}`
@@ -34,7 +34,8 @@ const displayquestions = async (req, res) => {
 
     return res.status(200).json({
       candidateName: candidate.candidateName,
-      questions
+      questions,
+      testSubmitted:candidate.testSubmitted
     });
 
   } catch (error) {

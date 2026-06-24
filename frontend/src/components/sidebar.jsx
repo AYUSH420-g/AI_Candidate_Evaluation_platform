@@ -1,54 +1,50 @@
-import { useNavigate ,useLocation} from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
+import { BriefcaseBusiness, BarChart2 } from "lucide-react";
+
 function Sidebar() {
-    function handleOpening() {
-        navigate("/Opening");
-    }
+  const navigate = useNavigate();
+  const location = useLocation();
 
-    function handleStatus() {
-        navigate("/Status");
-    }
+  const links = [
+    { label: "Openings", path: "/Opening", icon: BriefcaseBusiness },
+    { label: "Status", path: "/Status", icon: BarChart2 },
+  ];
 
-    const navigate = useNavigate();
-    const location=useLocation();
+  return (
+    <div className="fixed left-0 top-0 flex h-screen w-64 flex-col border-r border-gray-200 bg-white px-3 py-5">
+      <div className="mb-8 px-3">
+        <p className="text-xs font-medium uppercase tracking-widest text-gray-400">
+          Admin
+        </p>
+        <h1 className="mt-0.5 text-base font-medium text-gray-900">
+          Dashboard
+        </h1>
+      </div>
 
-    return (
-        <div className="fixed left-0 top-0 flex h-screen w-64 flex-col bg-gray-100 border p-4 text-black">
-
-            <h1 className="mb-8 text-2xl font-bold">
-                Admin Dashboard
-            </h1>
-
+      <nav className="flex flex-col gap-1">
+        {links.map(({ label, path, icon: Icon }) => {
+          const active = location.pathname === path;
+          return (
             <button
-                onClick={handleOpening}
-                className={`mb-3 rounded-lg px-4 py-3 text-left hover:bg-gray-300 ${
-                    location.pathname==="/Opening" ?"bg-gray-300 text-black"
-                    :"hover:bg-gray-100 text-black"
-                }`}
+              key={path}
+              onClick={() => navigate(path)}
+              className={`flex items-center gap-2.5 rounded-lg px-3 py-2.5 text-left text-sm transition-colors ${
+                active
+                  ? "bg-gray-100 font-medium text-gray-900"
+                  : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
+              }`}
             >
-                Openings
+              <Icon
+                size={16}
+                className={active ? "text-gray-900" : "text-gray-400"}
+              />
+              {label}
             </button>
-
-            <button onClick={handleStatus}
-                className={`mb-3 rounded-lg px-4 py-3 text-left hover:bg-gray-300 ${
-                    location.pathname==="/Status" ?"bg-gray-300 text-black"
-                    :"hover:bg-gray-100 text-black"
-                }`}>
-                Status
-            </button>
-
-            {/* <button className="mb-3 rounded-lg px-4 py-3 text-left hover:bg-gray-300">
-                B
-            </button>
-
-            <button className="mb-3 rounded-lg px-4 py-3 text-left hover:bg-gray-300">
-                C
-            </button>
-
-            <button className="rounded-lg px-4 py-3 text-left hover:bg-gray-300">
-                D
-            </button> */}
-
-        </div>
-    );
+          );
+        })}
+      </nav>
+    </div>
+  );
 }
+
 export default Sidebar;
