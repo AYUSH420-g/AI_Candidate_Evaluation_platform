@@ -276,7 +276,8 @@ const displaystatus=async (req,res)=>{
             link:1,
             testScore:1,
             totalQuestions:1,
-            testSubmitted:1
+            testSubmitted:1,
+            Questions:1
 
 
         })
@@ -679,6 +680,7 @@ If any validation fails, regenerate internally and return corrected JSON only.
             $set: {
             Questions: data,
             link: true,
+            status:"Accepted",
             link_url:url
             }
         },

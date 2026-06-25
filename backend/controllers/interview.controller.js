@@ -52,15 +52,14 @@ const submitInterview = async (req, res) => {
     const { id } = req.params;
     const { answers, code } = req.body;
 
-    const candidate =
-      await candidateMatch.findOne({
-        link_url: `${id}#${code}`
-      });
+    const candidate = await candidateMatch.findOne({
+      link_url: `${id}#${code}`
+    });
 
     if (!candidate) {
-      return res
-        .status(404)
-        .json({ message: "Candidate not found" });
+      return res.status(404).json({
+        message: "Candidate not found"
+      });
     }
 
     let score = 0;
@@ -72,25 +71,28 @@ const submitInterview = async (req, res) => {
     ];
 
     allQuestions.forEach((question) => {
-
-      const selectedAnswer =
-        answers[question._id.toString()];
+      const selectedAnswer = answers[question._id.toString()];
 
       if (selectedAnswer) {
-        question.selectedAnswer =
-          selectedAnswer;
+        question.selectedAnswer = selectedAnswer;
 
-        if (
-          selectedAnswer ===
-          question.correctAnswer
-        ) {
+        if (selectedAnswer === question.correctAnswer) {
           score++;
         }
       }
     });
 
+    const totalQuestions = allQuestions.length;
+    const percentage = (score / totalQuestions) * 100;
+
+    if (percentage > 35) {
+      candidate.status = "Shortlisted";
+    } else {
+      candidate.status = "Rejected";
+    }
+
     candidate.testScore = score;
-    candidate.totalQuestions = allQuestions.length;
+    candidate.totalQuestions = totalQuestions;
     candidate.testSubmitted = true;
 
     await candidate.save();
@@ -98,8 +100,9 @@ const submitInterview = async (req, res) => {
     res.status(200).json({
       success: true,
       score,
-      totalQuestions:
-        allQuestions.length
+      totalQuestions,
+      percentage,
+      status: candidate.status
     });
 
   } catch (error) {

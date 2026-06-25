@@ -76,6 +76,8 @@ function Status() {
     selectedCandidate?.recommendation === "Reject" ||
     selectedCandidate?.status === "Rejected";
 
+  const difficultyLabel = { easy: "Easy", medium: "Medium", hard: "Hard" };
+
   return (
     <>
       <Sidebar />
@@ -96,7 +98,6 @@ function Status() {
                 key={project._id}
                 className="overflow-hidden rounded-xl border border-gray-200 bg-white transition-shadow hover:shadow-sm"
               >
-                {/* Project header */}
                 <button
                   className="flex w-full items-center justify-between px-5 py-4 text-left transition-colors hover:bg-gray-50"
                   onClick={() => toggle(project)}
@@ -118,7 +119,6 @@ function Status() {
                   </span>
                 </button>
 
-                {/* Candidates panel */}
                 {expandedProject === project._id && (
                   <div className="border-t border-gray-100 bg-gray-50">
                     {loading ? (
@@ -174,17 +174,18 @@ function Status() {
         </div>
       </div>
 
-      {/* Candidate detail modal */}
       {selectedCandidate && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/30"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 px-4"
           onClick={(e) => {
             if (e.target === e.currentTarget) setSelectedCandidate(null);
           }}
         >
-          <div className="w-full max-w-lg rounded-xl border border-gray-200 bg-white p-6 shadow-xl">
-            {/* Modal header */}
-            <div className="mb-5 flex items-center justify-between">
+          <div
+            className="flex w-full max-w-lg flex-col rounded-xl border border-gray-200 bg-white shadow-xl"
+            style={{ maxHeight: "90vh" }}
+          >
+            <div className="flex shrink-0 items-center justify-between border-b border-gray-100 px-6 py-4">
               <div>
                 <p className="mb-0.5 text-xs font-medium uppercase tracking-widest text-gray-400">
                   Candidate
@@ -201,137 +202,223 @@ function Status() {
               </button>
             </div>
 
-            {/* Score cards */}
-            <div className={`mb-5 grid gap-3 ${selectedCandidate.testSubmitted ? "grid-cols-2" : "grid-cols-1"}`}>
-              <div className="rounded-lg border border-gray-200 bg-gray-50 p-4">
-                <p className="mb-1 text-xs font-medium uppercase tracking-widest text-gray-400">
-                  Resume match
-                </p>
-                <p className="text-3xl font-medium text-gray-900">
-                  {Math.round(selectedCandidate.overallScore)}
-                  <span className="text-lg text-gray-400">%</span>
-                </p>
-              </div>
+            <div className="flex-1 overflow-y-auto px-6 py-5">
 
-              {selectedCandidate.testSubmitted && (
+              <div
+                className={`mb-5 grid gap-3 ${
+                  selectedCandidate.testSubmitted ? "grid-cols-2" : "grid-cols-1"
+                }`}
+              >
                 <div className="rounded-lg border border-gray-200 bg-gray-50 p-4">
                   <p className="mb-1 text-xs font-medium uppercase tracking-widest text-gray-400">
-                    Interview score
+                    Resume match
                   </p>
                   <p className="text-3xl font-medium text-gray-900">
-                    {selectedCandidate.testScore}
-                    <span className="text-lg text-gray-400">
-                      /{selectedCandidate.totalQuestions}
-                    </span>
-                  </p>
-                  <p className="mt-0.5 text-xs text-gray-400">
-                    {Math.round(
-                      (selectedCandidate.testScore /
-                        selectedCandidate.totalQuestions) *
-                        100
-                    )}
-                    % correct
+                    {Math.round(selectedCandidate.overallScore)}
+                    <span className="text-lg text-gray-400">%</span>
                   </p>
                 </div>
+
+                {selectedCandidate.testSubmitted && (
+                  <div className="rounded-lg border border-gray-200 bg-gray-50 p-4">
+                    <p className="mb-1 text-xs font-medium uppercase tracking-widest text-gray-400">
+                      Interview score
+                    </p>
+                    <p className="text-3xl font-medium text-gray-900">
+                      {selectedCandidate.testScore}
+                      <span className="text-lg text-gray-400">
+                        /{selectedCandidate.totalQuestions}
+                      </span>
+                    </p>
+                    <p className="mt-0.5 text-xs text-gray-400">
+                      {Math.round(
+                        (selectedCandidate.testScore /
+                          selectedCandidate.totalQuestions) *
+                          100
+                      )}
+                      % correct
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              <div className="mb-4">
+                <p className="mb-2 text-xs font-medium uppercase tracking-widest text-gray-400">
+                  Matched skills
+                </p>
+                <div className="flex flex-wrap gap-1.5">
+                  {selectedCandidate.matchedSkills?.map((skill, i) => (
+                    <span
+                      key={i}
+                      className="rounded-full border border-green-200 bg-green-50 px-2.5 py-0.5 text-xs text-green-700"
+                    >
+                      {skill}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              <div className="mb-5">
+                <p className="mb-2 text-xs font-medium uppercase tracking-widest text-gray-400">
+                  Missing skills
+                </p>
+                <div className="flex flex-wrap gap-1.5">
+                  {selectedCandidate.missingSkills?.map((skill, i) => (
+                    <span
+                      key={i}
+                      className="rounded-full border border-red-200 bg-red-50 px-2.5 py-0.5 text-xs text-red-500"
+                    >
+                      {skill}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              {selectedCandidate.status === "Shortlisted" &&
+                selectedCandidate.testSubmitted && (
+                  <div className="mb-5">
+                    <p className="mb-3 text-xs font-medium uppercase tracking-widest text-gray-400">
+                      Interview review
+                    </p>
+                    <div className="flex flex-col gap-3">
+                      {["easy", "medium", "hard"].map((level) =>
+                        selectedCandidate.Questions?.[level]?.map((q, index) => (
+                          <div
+                            key={q._id}
+                            className="rounded-lg border border-gray-200 bg-gray-50 p-4"
+                          >
+                            {/* Question */}
+                            <div className="mb-3 flex items-start justify-between gap-3">
+                              <p className="text-sm font-medium text-gray-900">
+                                {index + 1}. {q.question}
+                              </p>
+                              <span className="shrink-0 rounded-full border border-gray-200 bg-white px-2 py-0.5 text-xs text-gray-400">
+                                {difficultyLabel[level]}
+                              </span>
+                            </div>
+
+                            {/* Options */}
+                            <div className="flex flex-col gap-1.5">
+                              {Object.entries(q.options || {}).map(([key, value]) => {
+                                const isCorrect = key === q.correctAnswer;
+                                const isSelected = key === q.selectedAnswer;
+                                const isWrong = isSelected && !isCorrect;
+
+                                return (
+                                  <div
+                                    key={key}
+                                    className={`flex items-center gap-2.5 rounded-lg border px-3 py-2 text-xs ${
+                                      isCorrect
+                                        ? "border-green-200 bg-green-50 text-green-700"
+                                        : isWrong
+                                        ? "border-red-200 bg-red-50 text-red-600"
+                                        : "border-gray-200 bg-white text-gray-500"
+                                    }`}
+                                  >
+                                    <span
+                                      className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full border text-[10px] font-medium ${
+                                        isCorrect
+                                          ? "border-green-400 bg-green-100 text-green-700"
+                                          : isWrong
+                                          ? "border-red-400 bg-red-100 text-red-600"
+                                          : "border-gray-300 bg-white text-gray-400"
+                                      }`}
+                                    >
+                                      {key}
+                                    </span>
+                                    {value}
+                                    {isCorrect && (
+                                      <span className="ml-auto text-[10px] font-medium text-green-600">
+                                        Correct
+                                      </span>
+                                    )}
+                                    {isWrong && (
+                                      <span className="ml-auto text-[10px] font-medium text-red-500">
+                                        Selected
+                                      </span>
+                                    )}
+                                  </div>
+                                );
+                              })}
+                            </div>
+
+                            {!q.selectedAnswer && (
+                              <p className="mt-2 text-xs text-gray-400">
+                                No answer selected
+                              </p>
+                            )}
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </div>
+                )}
+            </div>
+
+            <div className="shrink-0 border-t border-gray-100 px-6 py-4">
+              {isRejected ? (
+                <span className="inline-block rounded-full border border-red-200 bg-red-50 px-3 py-1 text-sm text-red-600">
+                  Rejected
+                </span>
+              ) : (
+                <>
+                  {selectedCandidate.link && (
+                    <p className="mb-3 rounded-lg border border-yellow-200 bg-yellow-50 px-4 py-2.5 text-xs font-medium text-yellow-700">
+                      Interview questions already generated for this candidate.
+                    </p>
+                  )}
+
+                  <div
+                    className={`flex gap-2 ${
+                      selectedCandidate.link
+                        ? "pointer-events-none opacity-40"
+                        : ""
+                    }`}
+                  >
+                    <button
+                      onClick={() => handleAccept(selectedCandidate)}
+                      disabled={selectedCandidate.link || acceptLoading}
+                      className="flex items-center gap-2 rounded-lg bg-gray-900 px-5 py-2 text-sm font-medium text-white transition-opacity hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-40"
+                    >
+                      {acceptLoading ? (
+                        <>
+                          <svg
+                            className="h-4 w-4 animate-spin"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                          >
+                            <circle
+                              className="opacity-25"
+                              cx="12"
+                              cy="12"
+                              r="10"
+                              stroke="currentColor"
+                              strokeWidth="3"
+                            />
+                            <path
+                              className="opacity-75"
+                              fill="currentColor"
+                              d="M4 12a8 8 0 018-8v8H4z"
+                            />
+                          </svg>
+                          Accepting…
+                        </>
+                      ) : (
+                        "Accept"
+                      )}
+                    </button>
+
+                    <button
+                      onClick={() => handleReject(selectedCandidate)}
+                      disabled={selectedCandidate.link}
+                      className="rounded-lg border border-red-200 bg-red-50 px-5 py-2 text-sm font-medium text-red-600 transition-colors hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-40"
+                    >
+                      Reject
+                    </button>
+                  </div>
+                </>
               )}
             </div>
-
-            {/* Skills */}
-            <div className="mb-4">
-              <p className="mb-2 text-xs font-medium uppercase tracking-widest text-gray-400">
-                Matched skills
-              </p>
-              <div className="flex flex-wrap gap-1.5">
-                {selectedCandidate.matchedSkills?.map((skill, i) => (
-                  <span
-                    key={i}
-                    className="rounded-full border border-green-200 bg-green-50 px-2.5 py-0.5 text-xs text-green-700"
-                  >
-                    {skill}
-                  </span>
-                ))}
-              </div>
-            </div>
-
-            <div className="mb-6">
-              <p className="mb-2 text-xs font-medium uppercase tracking-widest text-gray-400">
-                Missing skills
-              </p>
-              <div className="flex flex-wrap gap-1.5">
-                {selectedCandidate.missingSkills?.map((skill, i) => (
-                  <span
-                    key={i}
-                    className="rounded-full border border-red-200 bg-red-50 px-2.5 py-0.5 text-xs text-red-500"
-                  >
-                    {skill}
-                  </span>
-                ))}
-              </div>
-            </div>
-
-            {/* Actions */}
-            {isRejected ? (
-              <span className="inline-block rounded-full border border-red-200 bg-red-50 px-3 py-1 text-sm text-red-600">
-                Rejected
-              </span>
-            ) : (
-              <>
-                {selectedCandidate.link && (
-                  <p className="mb-4 rounded-lg border border-yellow-200 bg-yellow-50 px-4 py-2.5 text-xs font-medium text-yellow-700">
-                    Interview questions already generated for this candidate.
-                  </p>
-                )}
-
-                <div
-                  className={`flex gap-2 ${
-                    selectedCandidate.link
-                      ? "pointer-events-none opacity-40"
-                      : ""
-                  }`}
-                >
-                  <button
-                    onClick={() => handleAccept(selectedCandidate)}
-                    disabled={selectedCandidate.link || acceptLoading}
-                    className="flex items-center gap-2 rounded-lg bg-gray-900 px-5 py-2 text-sm font-medium text-white transition-opacity hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-40"
-                  >
-                    {acceptLoading ? (
-                      <>
-                        <svg
-                          className="h-4 w-4 animate-spin"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                        >
-                          <circle
-                            className="opacity-25"
-                            cx="12"
-                            cy="12"
-                            r="10"
-                            stroke="currentColor"
-                            strokeWidth="3"
-                          />
-                          <path
-                            className="opacity-75"
-                            fill="currentColor"
-                            d="M4 12a8 8 0 018-8v8H4z"
-                          />
-                        </svg>
-                        Accepting…
-                      </>
-                    ) : (
-                      "Accept"
-                    )}
-                  </button>
-
-                  <button
-                    onClick={() => handleReject(selectedCandidate)}
-                    disabled={selectedCandidate.link}
-                    className="rounded-lg border border-red-200 bg-red-50 px-5 py-2 text-sm font-medium text-red-600 transition-colors hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-40"
-                  >
-                    Reject
-                  </button>
-                </div>
-              </>
-            )}
           </div>
         </div>
       )}
