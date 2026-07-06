@@ -175,7 +175,7 @@ const storeDetails=async(req,res)=>{
             
             const response=await ollama.chat({
 
-                model:"llama3.2:3b",
+                model:"llama3.1:8b",
                 messages:[
                         {
                         role:"user",
@@ -348,327 +348,459 @@ const genQuestion=async(req,res)=>{
 
         const url=generate();
 
-        const prompt = `
-            You are a STRICT JSON API.
+        const easyPrompt = `You are a senior technical interviewer.
 
-Your ONLY task is to generate interview questions.
+Return ONLY valid JSON.
+Do not return markdown.
+Do not return explanations.
+Do not return any text outside JSON.
 
-IMPORTANT:
-
-* Return ONLY valid JSON.
-* No markdown.
-* No explanations.
-* No notes.
-* No text before JSON.
-* No text after JSON.
-* Output must be directly parsable by JSON.parse().
-
-==================================================
+====================================
 INPUT
-=====
+====================================
 
-The technical skills, frameworks, languages, and tools will be provided in:
+Candidate Technologies
 
 ${text}
 
-Generate questions ONLY from skills mentioned in ${text}.
+Only use technologies mentioned above.
 
-Do NOT use any technology that is not present in ${text}.
+Never introduce any technology that is not listed.
 
-==================================================
-QUESTION COUNT (MANDATORY)
-==========================
+====================================
+TASK
+====================================
 
-Generate EXACTLY 10 questions.
+Generate exactly 3 EASY interview questions.
 
-Distribution:
+Question Order
 
-Easy = 4 Questions
+1. Aptitude
+2. Aptitude
+3. Technical
 
-* 2 Aptitude
-* 2 Technical
-
-Medium = 3 Questions
-
-* 1 Aptitude
-* 2 Technical
-
-Hard = 3 Questions
-
-* 1 Aptitude
-* 2 Technical
-
-Total:
-
-* Aptitude = 4
-* Technical = 6
-
-
-
-==================================================
-EXPERIENCE LEVEL
-================
-
-Assume candidate has 3-5 years of professional experience.
-
-Questions should be realistic interview questions asked to experienced developers.
-
-Avoid fresher-level generic theory questions.
-
-==================================================
+====================================
 APTITUDE RULES
-==============
+====================================
 
-Aptitude questions MUST NOT use any technology from ${text}.
+Generate numerical aptitude questions only.
 
-Generate aptitude questions from topics such as:
+Allowed topics
 
-* Time and Work
-* Speed Distance
-* Train Problems
-* Ages
-* Ratio
-* Percentage
-* Profit and Loss
-* Average
-* Simple Interest
-* Compound Interest
-* Probability
-* Mixture and Allegation
+- Time & Work
+- Speed & Distance
+- Trains
+- Ages
+- Ratio
+- Percentage
+- Average
+- Profit & Loss
+- Probability
+- SI
+- CI
+- Mixture
 
-Requirements:
+Never use programming or technology.
 
-* Numerical aptitude only.
-* Moderate to challenging interview level.
-* Must have exactly one correct answer.
-* No code field.
-
-==================================================
+====================================
 TECHNICAL RULES
-===============
+====================================
 
-Technical questions MUST be generated ONLY from technologies found in ${text}.
+Generate ONLY ONE technical question.
 
-Preferred question styles:
+Use ONLY technologies from the candidate input.
 
-* Output Prediction
-* Complete The Code
-* Fill In The Blank
-* Find Bug
-* API Design
-* Database Query
-* Aggregation
-* Async Programming
-* Closures
-* OOP Concepts
-* Framework Behavior
-* Middleware Concepts
-* Query Optimization
-* State Management
-* Promise Handling
+Preferred styles
 
-Avoid generic questions like:
+- Predict Output
+- Complete Code
+- Find Bug
+- Debug Code
+- Async
+- Promise
+- Closure
+- Event Loop
+- Express Middleware
+- MongoDB Query
+- React State
 
-❌ What is JavaScript?
-❌ Explain React.
-❌ What is Node.js?
+Avoid definitions.
 
-Prefer:
+Do NOT ask
 
-✅ What is the output?
-✅ Which query returns the correct result?
-✅ Complete the missing code.
-✅ Which API behavior is correct?
-✅ Which middleware executes first?
-✅ Which aggregation pipeline returns the expected result?
+"What is React?"
+"What is Node?"
+"Explain JavaScript."
 
-==================================================
-CODE QUESTION RULE
-==================
+====================================
+MCQ RULES
+====================================
 
-For any of the following:
+Every question must contain
 
-* Output Prediction
-* Complete Code
-* Fill In The Blank
-* Debugging
-* Find Bug
-* Predict Result
-* Async Behavior
-* Closure Question
+- exactly 4 options
+- exactly 1 correct answer
 
-A "code" field is REQUIRED.
+Wrong answers should be realistic.
 
-Never generate these question types without code.
+If code is required, fill the code field.
 
-Example:
+Otherwise
+
+"code":""
+
+====================================
+OUTPUT
+====================================
 
 {
-"question": "What is the output?",
-"code": "console.log(typeof null)",
-"options": {
-"A": "null",
-"B": "object",
-"C": "undefined",
-"D": "number"
-},
-"correctAnswer": "B",
-"type": "technical",
-"difficulty": "medium"
-}
+  "easy":[
+    {
+      "id":1,
+      "type":"aptitude",
+      "difficulty":"easy",
+      "question":"",
+      "code":"",
+      "options":{
+        "A":"",
+        "B":"",
+        "C":"",
+        "D":""
+      },
+      "correctAnswer":"A"
+    },
+    {},
+    {}
+  ]
+}`;    
+        const mediumPrompt = `You are a senior technical interviewer.
 
-==================================================
-OPTIONS RULES
-=============
+Return ONLY valid JSON.
+Do not return markdown.
+Do not return explanations.
+Do not return any text outside JSON.
 
-Every question MUST contain:
+====================================
+INPUT
+====================================
+
+Candidate Technologies
+
+${text}
+
+Only use technologies mentioned above.
+
+Never introduce technologies that are not listed.
+
+====================================
+TASK
+====================================
+
+Generate exactly 4 MEDIUM questions.
+
+Question Order
+
+1. Aptitude
+2. Technical
+3. Technical
+4. Technical
+
+====================================
+IMPORTANT
+====================================
+
+ALL THREE technical questions MUST contain code.
+
+The code field MUST NOT be empty.
+
+Every coding question should require reasoning.
+
+Preferred styles
+
+- Predict Output
+- Complete Code
+- Find Bug
+- Debug Code
+- Async Programming
+- Promise
+- Event Loop
+- Closures
+- Express Middleware
+- MongoDB Query
+- Aggregation
+- API Design
+- React State
+
+Avoid definitions.
+
+====================================
+APTITUDE
+====================================
+
+Generate ONE numerical aptitude question only.
+
+Allowed topics
+
+- Time & Work
+- Speed & Distance
+- Trains
+- Ages
+- Ratio
+- Percentage
+- Average
+- Profit & Loss
+- Probability
+- SI
+- CI
+- Mixture
+
+====================================
+MCQ RULES
+====================================
+
+Each question must contain
+
+- exactly 4 options
+- exactly 1 correct answer
+
+Wrong answers should be realistic.
+
+====================================
+OUTPUT
+====================================
 
 {
-"A": "...",
-"B": "...",
-"C": "...",
-"D": "..."
-}
+  "medium":[
+    {
+      "id":4,
+      "type":"aptitude",
+      "difficulty":"medium",
+      "question":"",
+      "code":"",
+      "options":{
+        "A":"",
+        "B":"",
+        "C":"",
+        "D":""
+      },
+      "correctAnswer":"A"
+    },
+    {
+      "id":5,
+      "type":"technical",
+      "difficulty":"medium",
+      "question":"",
+      "code":"",
+      "options":{
+        "A":"",
+        "B":"",
+        "C":"",
+        "D":""
+      },
+      "correctAnswer":"A"
+    },
+    {},
+    {}
+  ]
+}`;   
+        const hardPrompt = `You are a senior technical interviewer.
 
-Requirements:
+Return ONLY valid JSON.
+Do not return markdown.
+Do not return explanations.
+Do not return any text outside JSON.
 
-* Exactly 4 options.
-* Exactly 1 correct answer.
-* Wrong answers must be realistic.
-* Wrong answers should be confusing and close to the correct answer.
-* Avoid obviously wrong choices.
+====================================
+INPUT
+====================================
 
-==================================================
-QUESTION OBJECT FORMAT
-======================
+Candidate Technologies
 
-CODE QUESTION
+${text}
+
+Only use technologies mentioned above.
+
+Never introduce technologies that are not listed.
+
+====================================
+TASK
+====================================
+
+Generate exactly 3 HARD questions.
+
+Question Order
+
+1. Aptitude
+2. Technical
+3. Technical
+
+====================================
+APTITUDE
+====================================
+
+Generate ONE numerical aptitude question.
+
+Allowed topics
+
+- Time & Work
+- Speed & Distance
+- Trains
+- Ages
+- Ratio
+- Percentage
+- Average
+- Profit & Loss
+- Probability
+- SI
+- CI
+- Mixture
+
+====================================
+TECHNICAL
+====================================
+
+Generate TWO advanced technical questions.
+
+Both MUST be scenario-based.
+
+Do NOT ask theory.
+
+Both MUST test deep practical knowledge.
+
+Preferred topics
+
+- Event Loop Internals
+- Async Execution
+- Promise Chain
+- Memory Leaks
+- Closures
+- Hoisting Edge Cases
+- React Rendering
+- React Performance
+- useEffect Bugs
+- MongoDB Aggregation
+- Aggregation Optimization
+- Indexing
+- Express Middleware
+- API Design
+- Authentication
+- Transactions
+- OOP Design
+- Performance Optimization
+
+Both questions MUST contain code.
+
+The code field MUST NOT be empty.
+
+====================================
+MCQ RULES
+====================================
+
+Each question must contain
+
+- exactly 4 options
+- exactly 1 correct answer
+
+Wrong answers should be realistic.
+
+====================================
+OUTPUT
+====================================
 
 {
-"question": "",
-"code": "",
-"options": {
-"A": "",
-"B": "",
-"C": "",
-"D": ""
-},
-"correctAnswer": "A",
-"type": "technical",
-"difficulty": "easy"
-}
+  "hard":[
+    {
+      "id":8,
+      "type":"aptitude",
+      "difficulty":"hard",
+      "question":"",
+      "code":"",
+      "options":{
+        "A":"",
+        "B":"",
+        "C":"",
+        "D":""
+      },
+      "correctAnswer":"A"
+    },
+    {
+      "id":9,
+      "type":"technical",
+      "difficulty":"hard",
+      "question":"",
+      "code":"",
+      "options":{
+        "A":"",
+        "B":"",
+        "C":"",
+        "D":""
+      },
+      "correctAnswer":"A"
+    },
+    {
+      "id":10,
+      "type":"technical",
+      "difficulty":"hard",
+      "question":"",
+      "code":"",
+      "options":{
+        "A":"",
+        "B":"",
+        "C":"",
+        "D":""
+      },
+      "correctAnswer":"A"
+    }
+  ]
+}`;    
+        const easyResponse = await ollama.chat({
+    model: "llama3.1:8b",
+    messages: [
+        {
+            role: "user",
+            content: easyPrompt
+        }
+    ],
+    format: "json"
+});
 
-NON-CODE QUESTION
+const easyData = JSON.parse(easyResponse.message.content);
 
-{
-"question": "",
-"options": {
-"A": "",
-"B": "",
-"C": "",
-"D": ""
-},
-"correctAnswer": "A",
-"type": "aptitude",
-"difficulty": "easy"
-}
+const mediumResponse = await ollama.chat({
+    model: "llama3.1:8b",
+    messages: [
+        {
+            role: "user",
+            content: mediumPrompt
+        }
+    ],
+    format: "json"
+});
 
-==================================================
-OUTPUT FORMAT
-=============
+const mediumData = JSON.parse(mediumResponse.message.content);
 
-{
-"easy": [
-{},
-{},
-{},
-{}
-],
-"medium": [
-{},
-{},
-{}
-],
-"hard": [
-{},
-{},
-{}
-]
-}
+const hardResponse = await ollama.chat({
+    model: "llama3.1:8b",
+    messages: [
+        {
+            role: "user",
+            content: hardPrompt
+        }
+    ],
+    format: "json"
+});
 
-==================================================
-ORDER RULE (MANDATORY)
-======================
+const hardData = JSON.parse(hardResponse.message.content);
 
-Easy:
-1 = Aptitude
-2 = Aptitude
-3 = Technical
-4 = Technical
+const data = {
+    easy: easyData.easy,
+    medium: mediumData.medium,
+    hard: hardData.hard
+};
 
-Medium:
-5 = Aptitude
-6 = Technical
-7 = Technical
-
-Hard:
-8 = Aptitude
-9 = Technical
-10 = Technical
-
-==================================================
-FINAL VALIDATION
-================
-
-Before returning:
-
-✓ Valid JSON
-
-✓ Exactly 10 Questions
-
-✓ Easy = 4
-
-✓ Medium = 3
-
-✓ Hard = 3
-
-✓ Aptitude = 4
-
-✓ Technical = 6
-
-✓ Technical questions only from ${text}
-
-✓ Every question has A,B,C,D
-
-✓ Exactly one correct answer
-
-✓ Code questions contain code field
-
-✓ Aptitude questions do NOT contain code field
-
-✓ JSON.parse(output) must succeed
-
-If any validation fails, regenerate internally and return corrected JSON only.
+console.log(data);
 
 
-
-            `;
-
-        const response=await ollama.chat(
-            {
-                model:"llama3.2:3b",
-                messages:[
-                    {
-                        role: "user",
-                        content: prompt
-                    }
-                ],
-                format: "json"
-            }   
-        );
-
-
-        const data=JSON.parse(response.message.content);
         console.log(data);
 
         const updated = await candidateMatch.findOneAndUpdate(
@@ -701,3 +833,116 @@ If any validation fails, regenerate internally and return corrected JSON only.
 };
 
 export {searchQuery,storeDetails,getStatus,displaystatus, rejectCandidate ,genQuestion};
+
+const aiGenerateOpening = async (req, res) => {
+    try {
+        const { prompt, token } = req.body;
+        jwt.verify(token, process.env.JWT_SECRET);
+        
+        const systemPrompt = `
+            You are an expert HR Job Description Parsing Engine.
+
+            Your task is to analyze the following natural language description of a job opening and return ONLY a valid JSON object that exactly matches the schema provided below.
+
+            ========================
+            STRICT OUTPUT RULES
+            ========================
+            1. Return ONLY raw JSON.
+            2. Do NOT return markdown.
+            3. Do NOT return explanations.
+            4. Output must be directly parsable using JSON.parse().
+
+            ========================
+            REQUIRED JSON SCHEMA
+            ========================
+            {
+            "job_title": null,
+            "seniority_level": "Junior",
+            "experience_required_years": null,
+            "mandatory_skills": [],
+            "preferred_skills": [],
+            "soft_skills": [],
+            "brief_summary": null
+            }
+
+            ========================
+            JOB DESCRIPTION PROMPT
+            ========================
+            ${prompt}
+        `;
+
+        const response = await ollama.chat({
+            model: "llama3.1:8b",
+            messages: [{ role: "user", content: systemPrompt }]
+        });
+
+        let content = response.message.content;
+        // In case ollama returns markdown despite instructions
+        if (content.startsWith("\`\`\`json")) {
+            content = content.replace(/\`\`\`json/g, "").replace(/\`\`\`/g, "");
+        } else if (content.startsWith("\`\`\`")) {
+            content = content.replace(/\`\`\`/g, "");
+        }
+
+        const jobData = JSON.parse(content);
+        return res.status(200).json({ jobData });
+    } catch (e) {
+        console.log(e);
+        return res.status(500).json({ message: "Failed to generate AI opening details." });
+    }
+};
+
+const aiCreateOpening = async (req, res) => {
+    try {
+        const { jobData, token } = req.body;
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+        const recruiters = await User.find({ Role: "recruiter" }, "_id");
+        const list = recruiters.map(r => r._id);
+
+        const embeddingText = `
+            Job Title: ${jobData.job_title}
+            Seniority Level: ${jobData.seniority_level}
+            Experience Required: ${jobData.experience_required_years ?? 0} years
+            Mandatory Skills:
+            ${(jobData.mandatory_skills || []).join(", ")}
+            Preferred Skills:
+            ${(jobData.preferred_skills || []).join(", ")}
+            Soft Skills:
+            ${(jobData.soft_skills || []).join(", ")}
+            Summary:
+            ${jobData.brief_summary ?? ""}
+        `;
+
+        const embeddingResponse = await ollama.embed({
+            model: "embeddinggemma",
+            input: embeddingText
+        });
+
+        const jdEmbedding = embeddingResponse.embeddings[0];
+
+        const query = {
+            projectName: jobData.job_title || "AI Generated Opening",
+            recruiterList: list,
+            adminId: decoded.id,
+            jobTitle: jobData.job_title || "AI Generated Opening",
+            seniorityLevel: jobData.seniority_level || "Junior",
+            experienceRequiredYears: jobData.experience_required_years || 0,
+            mandatorySkills: jobData.mandatory_skills || [],
+            preferredSkills: jobData.preferred_skills || [],
+            softSkills: jobData.soft_skills || [],
+            briefSummary: jobData.brief_summary || "",
+            embeddingText,
+            jdEmbedding
+        };
+
+        const opening = await Opening.create(query);
+        return res.status(201).json({ message: opening });
+
+    } catch (e) {
+        console.log(e);
+        return res.status(500).json({ message: e.message || "Failed to create opening." });
+    }
+};
+
+export { aiGenerateOpening, aiCreateOpening };

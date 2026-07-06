@@ -3,7 +3,9 @@ import Sidebar from "../components/sidebar";
 import axios from "axios";
 import { ChevronDown, ChevronUp } from "lucide-react";
 
+
 function Status() {
+  let count=1;
   const [projects, setProjects] = useState([]);
   const [candidates, setCandidates] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -44,6 +46,7 @@ function Status() {
         candidateId: candidate.candidateId,
       });
       console.log(res.data);
+      setSelectedCandidate(null);
     } catch (err) {
       console.log(err);
     } finally {
@@ -274,7 +277,7 @@ function Status() {
                 </div>
               </div>
 
-              {selectedCandidate.status === "Shortlisted" &&
+              {
                 selectedCandidate.testSubmitted && (
                   <div className="mb-5">
                     <p className="mb-3 text-xs font-medium uppercase tracking-widest text-gray-400">
@@ -282,15 +285,14 @@ function Status() {
                     </p>
                     <div className="flex flex-col gap-3">
                       {["easy", "medium", "hard"].map((level) =>
-                        selectedCandidate.Questions?.[level]?.map((q, index) => (
+                        selectedCandidate.Questions?.[level]?.map((q) => (
                           <div
                             key={q._id}
                             className="rounded-lg border border-gray-200 bg-gray-50 p-4"
                           >
-                            {/* Question */}
                             <div className="mb-3 flex items-start justify-between gap-3">
                               <p className="text-sm font-medium text-gray-900">
-                                {index + 1}. {q.question}
+                                {count++}. {q.question}
                               </p>
                               <span className="shrink-0 rounded-full border border-gray-200 bg-white px-2 py-0.5 text-xs text-gray-400">
                                 {difficultyLabel[level]}

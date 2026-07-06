@@ -1,5 +1,5 @@
 import { useNavigate, useLocation } from "react-router-dom";
-import { BriefcaseBusiness, BarChart2 } from "lucide-react";
+import { BriefcaseBusiness, BarChart2, Bot } from "lucide-react";
 
 function Sidebar() {
   const navigate = useNavigate();
@@ -8,6 +8,7 @@ function Sidebar() {
   const links = [
     { label: "Openings", path: "/Opening", icon: BriefcaseBusiness },
     { label: "Status", path: "/Status", icon: BarChart2 },
+    { label: "AI Opening", path: "/AIOpening", icon: Bot },
   ];
 
   return (

@@ -13,10 +13,10 @@ const openingSchema = new mongoose.Schema(
       required: true,
     },
     
-    recruiterList:{
+    recruiterList:[{
         type: mongoose.Schema.Types.ObjectId,
         default:[]
-    },
+    }],
 
     jobTitle: {
       type: String,

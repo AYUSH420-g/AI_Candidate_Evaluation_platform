@@ -3,6 +3,7 @@ import Home from './Home';
 import SignUp from './Signup';
 import Login from "./Login";
 import Opening from "./admin/Opening";
+import AIOpening from "./admin/AIOpening";
 import Project from "./recruiter/Project";
 import Status from "./admin/Status";
 import Interview from "./Interview";
@@ -16,6 +17,7 @@ function App() {
         <Route path="/Signup" element={<SignUp/>}/>
         <Route path="/Login" element={<Login/>}/>
         <Route path="/Opening" element={<Opening/>}/>
+        <Route path="/AIOpening" element={<AIOpening/>}/>
         <Route path="/Project" element={<Project/>}/>
         <Route path="/Status" element={<Status/>}/>
         <Route path="/interview/:id" element={<Interview/>}/>

@@ -40,129 +40,146 @@ const handleCandidate=async(req,res)=>{
         const result = await pdf(buffer);
         const resumeText = result.text;
 
-        const prompt = `
-            You are an expert Resume Parsing Engine.
+        const prompt =`You are an expert Resume Parsing Engine.
 
-            Your task is to analyze the resume and return ONLY a valid JSON object that exactly matches the schema below.
+Extract information from the resume and return ONLY a valid JSON object.
 
-            ========================
-            STRICT OUTPUT RULES
-            ========================
+RULES
+- Return ONLY valid JSON.
+- No markdown.
+- No explanations.
+- No comments.
+- No code fences.
+- No extra text.
+- Output must be directly parsable using JSON.parse().
+- Follow the schema exactly.
+- Never add, remove, or rename fields.
+- Every field must exist.
 
-            1. Return ONLY raw JSON.
-            2. Do NOT return markdown.
-            3. Do NOT return explanations.
-            4. Do NOT return notes.
-            5. Do NOT return comments.
-            6. Do NOT return code blocks.
-            7. Do NOT return any text before the JSON.
-            8. Do NOT return any text after the JSON.
-            9. The response must be directly parsable using JSON.parse().
-            10. Follow the schema exactly.
-            11. Never create additional fields.
-            12. Never remove fields.
-            13. Never rename fields.
-            14. Every field must always exist.
-            15. Missing values must follow datatype rules.
-            16. Output only the JSON object.
+FIELDS
 
-            ========================
-            FIELD RULES
-            ========================
+name
+- Extract the candidate's full name.
+- Return null if not found.
 
-            name:
-            - Candidate full name.
-            - String if found.
-            - Otherwise null.
+email
+- Extract the primary email address.
+- Return null if not found.
 
-            email:
-            - Candidate email address.
-            - String if found.
-            - Otherwise null.
+experience_years
+- Calculate total professional experience.
+- Return a number.
+- Return 0 if unavailable.
 
-            seniority_level:
-            - Must be exactly one of:
-            "Junior"
-            "Mid"
-            "Senior"
-            "Lead"
-            - Determine from total experience.
-            - If unclear:
-            - 0-2 years => Junior
-            - 3-5 years => Mid
-            - 6-9 years => Senior
-            - 10+ years => Lead
+seniority_level
+Determine from experience_years only:
+- 0-2 = Junior
+- 3-5 = Mid
+- 6-9 = Senior
+- 10+ = Lead
 
-            experience_years:
-            - Total professional experience.
-            - Must be a number.
-            - If unavailable, return 0.
+skills
+Extract ALL technical skills mentioned in the resume, including:
+- Programming Languages
+- Frameworks
+- Libraries
+- Databases
+- Cloud Platforms
+- DevOps Tools
+- Testing Tools
+- Version Control
+- Build Tools
+- APIs
+- Technologies
+- Software
+- Platforms
 
-            skills:
-            - Include ALL technical skills.
-            - Include ALL technologies.
-            - Include ALL frameworks.
-            - Include ALL databases.
-            - Include ALL tools.
-            - Include ALL cloud platforms.
-            - Include ALL programming languages.
-            - Do NOT limit the number of skills.
-            - Remove duplicates.
-            - If none found return [].
+Rules:
+- Preserve original names.
+- Remove duplicates.
+- Never infer missing skills.
+- Return [] if none.
 
-            ai_summary:
-            - Generate a concise 2-3 sentence professional summary.
-            - Mention major skills and experience.
-            - If insufficient information exists return null.
+Before responding:
+- Ensure every field exists.
+- experience_years must be a number.
+- skills must be an array.
+- Remove duplicate skills.
+- Return valid JSON only.
 
-            ========================
-            IMPORTANT EXTRACTION RULES
-            ========================
+Output Schema
 
-            - Extract ALL skills.
-            - Do not summarize skill lists.
-            - Do not select only top skills.
-            - Preserve original skill names whenever possible.
-            - Remove duplicate skills.
-            - Do not invent skills.
-            - Do not infer technologies not present in the resume.
-            - Return valid JSON only.
+{
+  "name": null,
+  "email": null,
+  "seniority_level": "Junior",
+  "experience_years": 0,
+  "skills": []
+}
 
-            ========================
-            REQUIRED JSON SCHEMA
-            ========================
+Resume
 
-            {
-            "name": null,
-            "email": null,
-            "seniority_level": "Junior",
-            "experience_years": 0,
-            "skills": [],
-            "ai_summary": null
-            }
-
-            ========================
-            RESUME
-            ========================
-
-            ${resumeText}
+${resumeText}
             `;
 
             const response=await ollama.chat(
                 {
-                     model: "llama3.2:3b",
+                     model: "llama3.1:8b",
                     messages: [
                         {
                             role: "user",
                             content: prompt
                         }
-                    ]
+                    ],
+                    format: 'json'
                 }
             );
-
+            console.log(response);
             const candidateData = JSON.parse(
             response.message.content
         );
+
+        const summaryPrompt = `
+            You are a professional resume summary writer.
+
+            Generate ONLY valid JSON.
+
+            Rules:
+            - Return ONLY JSON.
+            - No markdown.
+            - No explanations.
+            - No extra text.
+
+            Maximum 45 words.
+            Write in third person.
+
+            Use ONLY the information below.
+            Never invent skills, projects, certifications or experience.
+
+            Candidate:
+
+            ${JSON.stringify(candidateData)}
+
+            Return:
+
+            {
+            "ai_summary": "..."
+            }
+            `;
+
+            const summaryResponse = await ollama.chat({
+                model: "llama3.1:8b",
+                messages: [
+                    {
+                        role: "user",
+                        content: summaryPrompt
+                    }
+                ],
+                format: "json"
+            });
+
+            const summaryData = JSON.parse(summaryResponse.message.content);
+            candidateData.aiSummary = summaryData.ai_summary;
 
         const embeddingText = `
             Seniority Level:
