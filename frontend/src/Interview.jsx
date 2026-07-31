@@ -252,7 +252,9 @@ function Interview() {
           </p>
 
           {q?.code && (
-            <pre style={styles.codeBlock}>{q.code}</pre>
+            <pre style={styles.codeBlock}>{
+              typeof q.code === "string" ? q.code.replace(/\\n/g, '\n') : JSON.stringify(q.code, null, 2)
+            }</pre>
           )}
 
           <div style={styles.optionsGrid}>
@@ -279,7 +281,9 @@ function Interview() {
                   style={{ accentColor: "#2563eb" }}
                 />
                 <span style={styles.optionKey}>{opt}</span>
-                {q?.options?.[opt]}
+                <span style={{ whiteSpace: "pre-wrap", wordBreak: "break-word" }}>
+                  {typeof q?.options?.[opt] === "string" ? q?.options?.[opt].replace(/\\n/g, '\n') : JSON.stringify(q?.options?.[opt])}
+                </span>
               </label>
             ))}
           </div>

@@ -134,6 +134,31 @@ function Status() {
                       </p>
                     ) : (
                       <div className="flex flex-col gap-2 p-4">
+                        <div className="flex justify-end mb-2">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              const headers = ["Candidate Name,Score,Status"];
+                              const rows = candidates.map(c => {
+                                const name = `"${c.candidateName || ''}"`;
+                                const score = c.overallScore != null ? Math.round(c.overallScore) : (c.testScore != null ? c.testScore : 'N/A');
+                                const status = `"${c.status || ''}"`;
+                                return `${name},${score},${status}`;
+                              });
+                              const csvContent = "data:text/csv;charset=utf-8," + headers.concat(rows).join("\n");
+                              const encodedUri = encodeURI(csvContent);
+                              const link = document.createElement("a");
+                              link.setAttribute("href", encodedUri);
+                              link.setAttribute("download", `${project.projectName}_candidates.csv`);
+                              document.body.appendChild(link);
+                              link.click();
+                              document.body.removeChild(link);
+                            }}
+                            className="flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-50"
+                          >
+                            Export CSV
+                          </button>
+                        </div>
                         {candidates.map((candidate) => (
                           <div
                             key={candidate._id}
@@ -291,13 +316,19 @@ function Status() {
                             className="rounded-lg border border-gray-200 bg-gray-50 p-4"
                           >
                             <div className="mb-3 flex items-start justify-between gap-3">
-                              <p className="text-sm font-medium text-gray-900">
-                                {count++}. {q.question}
+                              <p className="text-sm font-medium text-gray-900 whitespace-pre-wrap">
+                                {count++}. {typeof q.question === "string" ? q.question.replace(/\\n/g, '\n') : q.question}
                               </p>
                               <span className="shrink-0 rounded-full border border-gray-200 bg-white px-2 py-0.5 text-xs text-gray-400">
                                 {difficultyLabel[level]}
                               </span>
                             </div>
+
+                            {q.code && (
+                              <pre className="mb-3 overflow-x-auto rounded-lg border border-gray-200 bg-gray-100 p-3 text-xs font-mono text-gray-800">
+                                {typeof q.code === "string" ? q.code.replace(/\\n/g, '\n') : JSON.stringify(q.code, null, 2)}
+                              </pre>
+                            )}
 
                             {/* Options */}
                             <div className="flex flex-col gap-1.5">
@@ -328,7 +359,9 @@ function Status() {
                                     >
                                       {key}
                                     </span>
-                                    {value}
+                                    <span style={{ whiteSpace: "pre-wrap", wordBreak: "break-word", flex: 1 }}>
+                                      {typeof value === "string" ? value.replace(/\\n/g, '\n') : JSON.stringify(value)}
+                                    </span>
                                     {isCorrect && (
                                       <span className="ml-auto text-[10px] font-medium text-green-600">
                                         Correct
