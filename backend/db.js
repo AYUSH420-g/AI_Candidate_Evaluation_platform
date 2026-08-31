@@ -7,8 +7,7 @@ const connectDB=async ()=>{
     }
     catch(err)
     {
-        console.error("Database connection error:", error);
-        process.exit(1);
+        console.error("Database connection error:", err.message || err);
     }
 }
 export default connectDB;

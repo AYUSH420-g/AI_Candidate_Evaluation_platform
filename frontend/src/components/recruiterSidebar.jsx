@@ -1,5 +1,5 @@
 import { useNavigate, useLocation } from "react-router-dom";
-import { FolderOpen } from "lucide-react";
+import { FolderOpen, FileCheck } from "lucide-react";
 
 function RecruiterSidebar() {
   const navigate = useNavigate();
@@ -7,6 +7,7 @@ function RecruiterSidebar() {
 
   const links = [
     { label: "Projects", path: "/Project", icon: FolderOpen },
+    { label: "ATS Checker", path: "/ats", icon: FileCheck },
   ];
 
   return (

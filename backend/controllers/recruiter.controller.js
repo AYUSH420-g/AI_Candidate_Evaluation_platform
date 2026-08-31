@@ -5,6 +5,7 @@ import fs from "fs";
 import Opening from "../models/openings.model.js";
 import Candidate from "../models/candidate.model.js";
 import candidateMatch from "../models/candidateMatch.model.js";
+import { evaluateResumeATS } from "../services/ats.service.js";
 
 const displayOpenings=async(req,res)=>{
     try{
@@ -454,13 +455,60 @@ const getCandidates=async(req,res)=>{
             return res.status(200).json({
             candidates
         });
-
-            
     }
     catch(err)
     {
         console.log(err);
+        return res.status(500).json({ message: "Failed to get candidates" });
     }
-}
+};
 
-export {displayOpenings,handleCandidate,handleAnalyse,getCandidates}
+const handleAtsCheck = async (req, res) => {
+    try {
+        if (!req.file) {
+            return res.status(400).json({ message: "No resume PDF file uploaded" });
+        }
+
+        const filePath = req.file.path;
+        let buffer;
+        try {
+            buffer = fs.readFileSync(filePath);
+        } catch (readErr) {
+            return res.status(400).json({ message: "Failed to read uploaded resume file" });
+        }
+
+        const pdfData = await pdf(buffer);
+        const resumeText = pdfData?.text || "";
+
+        if (!resumeText.trim()) {
+            try { fs.unlinkSync(filePath); } catch (e) {}
+            return res.status(400).json({
+                message: "Unable to extract readable text from this PDF. Please ensure it is not scanned or an image-only document."
+            });
+        }
+
+        const jobDescription = req.body?.jobDescription || "";
+        const analysis = await evaluateResumeATS(resumeText, jobDescription);
+
+        try {
+            fs.unlinkSync(filePath);
+        } catch (unlinkErr) {
+            console.error("Error unlinking file:", unlinkErr);
+        }
+
+        return res.status(200).json({
+            message: "success",
+            analysis
+        });
+    } catch (error) {
+        if (req.file?.path && fs.existsSync(req.file.path)) {
+            try { fs.unlinkSync(req.file.path); } catch (e) {}
+        }
+        console.error("Error in handleAtsCheck:", error);
+        return res.status(500).json({
+            message: "ATS evaluation failed: " + (error.message || "Unknown error")
+        });
+    }
+};
+
+export {displayOpenings,handleCandidate,handleAnalyse,getCandidates,handleAtsCheck}
